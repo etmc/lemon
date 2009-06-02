@@ -13,11 +13,9 @@ int lemonFinishWriting(LemonWriter *writer)
   if (!writer->is_busy)
     return LEMON_SUCCESS;
 
-  MPI_Comm_size(writer->cartesian, &size);
-
   if (writer->is_collective)
     MPI_File_write_at_all_end(*writer->fh, writer->buffer, &status);
-  else
+  else if (writer->my_rank == 0)
     MPI_Wait(&writer->request, &status);
 
   writer->pos += writer->bytes_wanted;
@@ -26,12 +24,27 @@ int lemonFinishWriting(LemonWriter *writer)
 
   MPI_Get_count(&status, MPI_BYTE, &written);
 
-  if (written != (writer->is_collective ? writer->bytes_wanted / size : writer->bytes_wanted))
+  if (writer->is_collective)
   {
-    fprintf(stderr, "[LEMON] Node %d reports in lemonFinishWriting:\n"
-                    "        Could not write the required amount of data.\n", writer->my_rank);
-    fprintf(stderr, "        needed: %d, written: %d\n", writer->bytes_wanted / size , written);
-    return LEMON_ERR_WRITE;
+    MPI_Comm_size(writer->cartesian, &size);
+    if (written != writer->bytes_wanted / size)
+    {
+      fprintf(stderr, "[LEMON] Node %d reports in lemonFinishWriting:\n"
+                      "        Could not write the required amount of data.\n", writer->my_rank);
+      fprintf(stderr, "        needed: %d, written: %d\n", writer->bytes_wanted / size , written);
+      return LEMON_ERR_WRITE;
+    }
+  }
+  else
+  {
+    MPI_Bcast(&written, 1, MPI_INT, 0, writer->cartesian);
+    if (written != writer->bytes_wanted)
+    {
+      fprintf(stderr, "[LEMON] Node %d reports in lemonFinishWriting:\n"
+                      "        Could not write the required amount of data.\n", writer->my_rank);
+      fprintf(stderr, "        needed: %d, written: %d\n", writer->bytes_wanted / size , written);
+      return LEMON_ERR_WRITE;
+    }
   }
 
   writer->data_length = 0;
