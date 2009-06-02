@@ -2,18 +2,17 @@
 #include <lemon.h>
 #include <stdio.h>
 
-int lemonReadLatticeParallel(LemonReader *reader, void *data,
-                            MPI_Offset siteSize, int *latticeDims)
+int lemonReadLatticeParallelNonBlocking(LemonReader *reader, void *data,
+                                        MPI_Offset siteSize, int *latticeDims)
 {
   MPI_Datatype etype;
   MPI_Datatype ftype;
-  MPI_Status   status;
 
   int idx = 0;
   int ndims = 0;
   int localVol = 1;
   int totalVol = 1;
-  int read;
+  int err = 0;
   int *starts;
   int *localDims;
   int *mpiDims;
@@ -23,14 +22,14 @@ int lemonReadLatticeParallel(LemonReader *reader, void *data,
   /* Deal with reader state */
   if (reader == (LemonReader*)NULL)
   {
-    fprintf(stderr, "[LEMON] Node %d reports in lemonReadLatticeParallel:\n"
+    fprintf(stderr, "[LEMON] Node %d reports in lemonReadLatticeParallelNonBlocking:\n"
                     "        NULL pointer provided.\n", reader->my_rank);
     return LEMON_ERR_PARAM;
   }
 
   if (reader->is_awaiting_header)
   {
-    fprintf(stderr, "[LEMON] Node %d reports in lemonReadLatticeParallel:\n"
+    fprintf(stderr, "[LEMON] Node %d reports in lemonReadLatticeParallelNonBlocking:\n"
                     "        uninitialized reader provided.\n", reader->my_rank);
     return LEMON_ERR_READ;
   }
@@ -74,17 +73,11 @@ int lemonReadLatticeParallel(LemonReader *reader, void *data,
                      etype, ftype, "native", MPI_INFO_NULL);
 
   /* Blast away! */
-  MPI_File_read_at_all(*reader->fh, reader->pos, data, localVol, etype, &status);
-  MPI_Barrier(reader->cartesian);
-
-  MPI_Get_count(&status, MPI_BYTE, &read);
-
-  reader->pos += totalVol * siteSize;
-
-  /* We want to leave the file in a well-defined state, so we reset the view to a default. */
-  /* We don't want to reread any data, so we maximize the file pointer globally. */
-  MPI_Barrier(reader->cartesian);
-  MPI_File_set_view(*reader->fh, 0, MPI_BYTE, MPI_BYTE, "native", MPI_INFO_NULL);
+  err = MPI_File_read_at_all_begin(*reader->fh, reader->pos, data, localVol, etype);
+  reader->is_busy = 1;
+  reader->is_striped = 1;
+  reader->buffer = data;
+  reader->bytes_wanted = totalVol * siteSize;
 
   /* Free up the resources we claimed for this operation. */
   MPI_Type_free(&etype);
@@ -95,10 +88,10 @@ int lemonReadLatticeParallel(LemonReader *reader, void *data,
   free(mpiCoords);
 
   /* Doing a data read should never get us to EOF, only header scanning */
-  if (read != siteSize * localVol)
+  if (err != MPI_SUCCESS)
   {
-    fprintf(stderr, "[LEMON] Node %d reports in lemonReadLatticeParallel:\n"
-                    "        Could not read the required amount of data.\n", reader->my_rank);
+    fprintf(stderr, "[LEMON] Node %d reports in lemonReadLatticeParallelNonBlocking:\n"
+                    "        MPI_File_read_at_all_begin returned error %d.\n", reader->my_rank, err);
     return LEMON_ERR_READ;
   }
 

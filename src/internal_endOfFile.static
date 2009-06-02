@@ -8,6 +8,9 @@ static int endOfFile(LemonReader *reader)
   unsigned char test;
   int read;
 
+  if (reader == (LemonReader*)NULL)
+    return LEMON_ERR_PARAM;
+
   if (reader->my_rank == 0)
   {
     MPI_File_read_at(*reader->fh, reader->off + reader->pos, &test, 1, MPI_UNSIGNED_CHAR, &stat);

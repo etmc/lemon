@@ -2,13 +2,13 @@
 #include <lemon.h>
 #include <stdio.h>
 
-int lemonWriteLatticeParallel(LemonWriter *writer, void *data,
-                             MPI_Offset siteSize, int *latticeDims)
+int lemonWriteLatticeParallelNonBlocking(LemonWriter *writer, void *data,
+                                         MPI_Offset siteSize, int *latticeDims)
 {
   MPI_Datatype etype;
   MPI_Datatype ftype;
-  MPI_Status status;
 
+  int err = 0;
   int idx = 0;
   int ndims = 0;
   int localVol = 1;
@@ -18,11 +18,10 @@ int lemonWriteLatticeParallel(LemonWriter *writer, void *data,
   int *mpiDims;
   int *mpiCoords;
   int *period;
-  int written;
 
   if (writer == (LemonWriter*)NULL || data == NULL || siteSize == 0 || latticeDims == (int*)NULL)
   {
-    fprintf(stderr, "[LEMON] Node %d reports in lemonWriteLatticeParallel:\n"
+    fprintf(stderr, "[LEMON] Node %d reports in lemonWriteLatticeParallelNonBlocking:\n"
                     "        problem with parameters provided.\n", writer->my_rank);
     return LEMON_ERR_PARAM;
   }
@@ -68,16 +67,13 @@ int lemonWriteLatticeParallel(LemonWriter *writer, void *data,
   MPI_File_set_view(*writer->fh, writer->off + writer->pos, etype, ftype, "native", MPI_INFO_NULL);
 
   /* Blast away! */
-  MPI_File_write_at_all(*writer->fh, writer->pos, data, localVol, etype, &status);
-  MPI_File_sync(*writer->fh);
+  err = MPI_File_write_at_all_begin(*writer->fh, writer->pos, data, localVol, etype);
+  writer->is_busy = 1;
+  writer->is_collective = 1;
+  writer->buffer = data;
+  writer->bytes_wanted = totalVol * siteSize;
 
   MPI_Barrier(writer->cartesian);
-
-  writer->pos += totalVol * siteSize;
-
-  /* We should reset the shared file pointer, in an MPI_BYTE based view... */
-  MPI_Barrier(writer->cartesian);
-  MPI_File_set_view(*writer->fh, 0, MPI_BYTE, MPI_BYTE, "native", MPI_INFO_NULL);
 
   /* Free up the resources we claimed for this operation. */
   MPI_Type_free(&etype);
@@ -87,11 +83,10 @@ int lemonWriteLatticeParallel(LemonWriter *writer, void *data,
   free(mpiDims);
   free(mpiCoords);
 
-  MPI_Get_count(&status, MPI_BYTE, &written);
-  if (written != siteSize * localVol)
+  if (err != MPI_SUCCESS)
   {
-    fprintf(stderr, "[LEMON] Node %d reports in lemonWriteLatticeParallel:\n"
-                    "        Could not write the required amount of data.\n", writer->my_rank);
+    fprintf(stderr, "[LEMON] Node %d reports in lemonWriteLatticeParallelNonBlocking:\n"
+                    "        MPI_File_write_at_all_begin return error %d.\n", writer->my_rank, err);
     return LEMON_ERR_WRITE;
   }
 

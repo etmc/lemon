@@ -31,7 +31,8 @@ NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
 bin_PROGRAMS = lemon_contents$(EXEEXT)
-check_PROGRAMS = canonical$(EXEEXT) parallel$(EXEEXT) xlf$(EXEEXT)
+check_PROGRAMS = canonical$(EXEEXT) parallel$(EXEEXT) xlf$(EXEEXT) \
+	parallel_non_blocking$(EXEEXT) xlf_non_blocking$(EXEEXT)
 subdir = test
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -56,10 +57,18 @@ am_parallel_OBJECTS = parallel.$(OBJEXT)
 parallel_OBJECTS = $(am_parallel_OBJECTS)
 parallel_LDADD = $(LDADD)
 parallel_DEPENDENCIES =
+parallel_non_blocking_SOURCES = parallel_non_blocking.c
+parallel_non_blocking_OBJECTS = parallel_non_blocking.$(OBJEXT)
+parallel_non_blocking_LDADD = $(LDADD)
+parallel_non_blocking_DEPENDENCIES =
 am_xlf_OBJECTS = xlf.$(OBJEXT)
 xlf_OBJECTS = $(am_xlf_OBJECTS)
 xlf_LDADD = $(LDADD)
 xlf_DEPENDENCIES =
+xlf_non_blocking_SOURCES = xlf_non_blocking.c
+xlf_non_blocking_OBJECTS = xlf_non_blocking.$(OBJEXT)
+xlf_non_blocking_LDADD = $(LDADD)
+xlf_non_blocking_DEPENDENCIES =
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -68,9 +77,11 @@ COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(canonical_SOURCES) $(lemon_contents_SOURCES) \
-	$(parallel_SOURCES) $(xlf_SOURCES)
+	$(parallel_SOURCES) parallel_non_blocking.c $(xlf_SOURCES) \
+	xlf_non_blocking.c
 DIST_SOURCES = $(canonical_SOURCES) $(lemon_contents_SOURCES) \
-	$(parallel_SOURCES) $(xlf_SOURCES)
+	$(parallel_SOURCES) parallel_non_blocking.c $(xlf_SOURCES) \
+	xlf_non_blocking.c
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -239,9 +250,15 @@ lemon_contents$(EXEEXT): $(lemon_contents_OBJECTS) $(lemon_contents_DEPENDENCIES
 parallel$(EXEEXT): $(parallel_OBJECTS) $(parallel_DEPENDENCIES) 
 	@rm -f parallel$(EXEEXT)
 	$(LINK) $(parallel_OBJECTS) $(parallel_LDADD) $(LIBS)
+parallel_non_blocking$(EXEEXT): $(parallel_non_blocking_OBJECTS) $(parallel_non_blocking_DEPENDENCIES) 
+	@rm -f parallel_non_blocking$(EXEEXT)
+	$(LINK) $(parallel_non_blocking_OBJECTS) $(parallel_non_blocking_LDADD) $(LIBS)
 xlf$(EXEEXT): $(xlf_OBJECTS) $(xlf_DEPENDENCIES) 
 	@rm -f xlf$(EXEEXT)
 	$(LINK) $(xlf_OBJECTS) $(xlf_LDADD) $(LIBS)
+xlf_non_blocking$(EXEEXT): $(xlf_non_blocking_OBJECTS) $(xlf_non_blocking_DEPENDENCIES) 
+	@rm -f xlf_non_blocking$(EXEEXT)
+	$(LINK) $(xlf_non_blocking_OBJECTS) $(xlf_non_blocking_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -252,7 +269,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/canonical.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lemon_contents.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/parallel.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/parallel_non_blocking.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/xlf.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/xlf_non_blocking.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

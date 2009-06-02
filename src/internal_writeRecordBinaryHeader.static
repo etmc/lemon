@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string.h>
+#include <stdio.h>
 
 #include <lemon_binheader.h>
 
@@ -13,6 +14,13 @@ static int writeLemonRecordBinaryHeader(LemonWriter *writer, LemonRecordHeader *
   int i;
   int result;
   MPI_Status status;
+
+  if (writer == (LemonWriter*)NULL || header == (LemonRecordHeader*)NULL)
+    return LEMON_ERR_PARAM;
+
+  /* The following should not be necessary */
+  if (writer->is_busy)
+    lemonFinishWriting(writer);
 
   /* Clear header */
   for(i = 0; i < HDR_SIZE_BYTES / sizeof(uint64_t); ++i)

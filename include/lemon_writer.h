@@ -26,20 +26,35 @@
  * please contact A. Deuzeman (a.deuzeman@rug.nl)                           *
  ****************************************************************************/
 
+#include <mpi.h>
+#include <lemon_header.h>
+
 typedef struct
 {
-  int first_record;
-  int last_written;
+  /* Binary structure */
   MPI_File* fh;
-  int header_nextP;
-  MPI_Offset bytes_total;
-  int isLastP;
 
-  MPI_Comm     cartesian;
-  int          my_rank;
+  /* Communicator setup */
+  MPI_Comm cartesian;
+  int      my_rank;
 
-  MPI_Offset   off;
-  MPI_Offset   pos;
+  /* File position trackers */
+  MPI_Offset off;
+  MPI_Offset pos;
+
+  /* Writer state flags */
+  int is_awaiting_header;
+  int is_busy;
+  int is_collective;
+  int is_first_record;
+  int is_last;
+  int is_last_written;
+
+  /* Data needed for tracking I/O requests */
+  void *buffer;
+  MPI_Request request;
+  int bytes_wanted;
+  MPI_Offset data_length;
 } LemonWriter;
 
 /* Writer manipulators */
@@ -53,6 +68,7 @@ int lemonWriterSeek(LemonWriter *writer, MPI_Offset offset, int whence);
 int lemonWriterSetState(LemonWriter *wdest, LemonWriter *wsrc);
 
 /* Additions for LEMON follow */
-int lemonWriteLatticeParallel(LemonWriter *writer, void *data,
-                             MPI_Offset siteSize, int *latticeDims);
-
+int lemonWriteLatticeParallel(LemonWriter *writer, void *data, MPI_Offset siteSize, int *latticeDims);
+int lemonWriteLatticeParallelNonBlocking(LemonWriter *writer, void *data, MPI_Offset siteSize, int *latticeDims);
+int lemonWriteRecordDataNonBlocking(void *source, uint64_t nbytes, LemonWriter* writer);
+int lemonFinishWriting(LemonWriter *writer);

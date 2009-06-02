@@ -26,23 +26,34 @@
  * please contact A. Deuzeman (a.deuzeman@rug.nl)                           *
  ****************************************************************************/
 
+#include <stdlib.h>
+#include <mpi.h>
+
 #include "lemon_header.h"
 
 typedef struct
 {
-  int is_last;
-  int header_nextP;
+  /* Binary structure */
   MPI_File *fh;
   LemonRecordHeader *curr_header;
 
-  MPI_Offset bytes_total;
-  size_t bytes_pad;
-
+  /* Communicator setup */
   MPI_Comm cartesian;
   int      my_rank;
 
+  /* File position trackers */
   MPI_Offset off;
   MPI_Offset pos;
+
+  /* Reader state flags */
+  int is_last;
+  int is_awaiting_header;
+  int is_busy;
+  int is_striped;
+
+  /* Data needed for tracking I/O requests */
+  void *buffer;
+  int bytes_wanted;
 } LemonReader;
 
 /* Reader manipulators */
@@ -62,10 +73,13 @@ int lemonReaderReadData(void *dest, uint64_t *nbytes, LemonReader *reader);
 int lemonReaderCloseRecord(LemonReader *reader);
 int lemonReaderSeek(LemonReader *reader, MPI_Offset offset, int whence);
 int lemonReaderSetState(LemonReader *rdest, LemonReader *rsrc);
-
-/* WAS THE FOLLOWING EVER IMPLEMENTED? */
 int lemonEOM(LemonReader *reader);
 
 /* Additions for LEMON follow */
 int lemonReadLatticeParallel(LemonReader *reader, void *data,
-                            MPI_Offset siteSize, int *latticeDims);
+                             MPI_Offset siteSize, int *latticeDims);
+int lemonReadLatticeParallelNonBlocking(LemonReader *reader, void *data,
+                                        MPI_Offset siteSize, int *latticeDims);
+int lemonReaderReadDataNonBlocking(void *dest, uint64_t nbytes, LemonReader *reader);
+int lemonFinishReading(LemonReader *reader);
+

@@ -2,5 +2,9 @@
 
 static int skipLemonRecordBinaryHeader(MPI_File *fh)
 {
-  return MPI_File_seek(*fh, (MPI_Offset)HDR_SIZE_BYTES, MPI_SEEK_CUR);
+  int err;
+  err = MPI_File_seek(*fh, (MPI_Offset)HDR_SIZE_BYTES, MPI_SEEK_CUR);
+  if (err == MPI_SUCCESS)
+    return LEMON_SUCCESS;
+  return LEMON_ERR_SEEK;
 }

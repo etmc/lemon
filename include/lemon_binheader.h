@@ -26,7 +26,9 @@
  * please contact A. Deuzeman (a.deuzeman@rug.nl)                           *
  ****************************************************************************/
 
-#include <lemon.h>
+#include <stdint.h>
+
+#define HDR_SIZE_BYTES 144
 
 static union
 {

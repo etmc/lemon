@@ -6,7 +6,7 @@ LDADD = @LIBS@ -llemon
 # The programs to build
 #
 bin_PROGRAMS = lemon_contents
-check_PROGRAMS = canonical parallel xlf
+check_PROGRAMS = canonical parallel xlf parallel_non_blocking xlf_non_blocking
 
 #
 # The program and its dependencies

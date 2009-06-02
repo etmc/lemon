@@ -6,9 +6,10 @@ void lemonDestroyReader(LemonReader *reader)
   if (reader == (LemonReader*)NULL)
     return;
 
-  free(reader->curr_header);
-  reader->curr_header = (LemonRecordHeader*)NULL;
+  if (reader->is_busy)
+    lemonFinishReading(reader);
 
+  free(reader->curr_header);
   MPI_Comm_free(&reader->cartesian);
 
   free(reader);

@@ -65,7 +65,12 @@ am_liblemon_a_OBJECTS = header_construct.$(OBJEXT) \
 	writer_seek.$(OBJEXT) reader_MBFlag.$(OBJEXT) \
 	reader_type.$(OBJEXT) writer_setState.$(OBJEXT) \
 	reader_bytes.$(OBJEXT) reader_MEFlag.$(OBJEXT) \
-	writer_closeRecord.$(OBJEXT)
+	writer_closeRecord.$(OBJEXT) reader_finishReading.$(OBJEXT) \
+	writer_finishWriting.$(OBJEXT) \
+	reader_readDataNonBlocking.$(OBJEXT) \
+	reader_latticeParallelNonBlocking.$(OBJEXT) \
+	writer_latticeParallelNonBlocking.$(OBJEXT) \
+	writer_recordDataNonBlocking.$(OBJEXT)
 liblemon_a_OBJECTS = $(am_liblemon_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -174,7 +179,10 @@ liblemon_a_SOURCES = header_construct.c reader_closeRecord.c \
                      reader_EOM.c reader_seek.c writer_recordData.c reader_getPointer.c \
                      reader_setPointer.c writer_recordHeader.c reader_latticeParallel.c \
                      reader_setState.c writer_seek.c reader_MBFlag.c reader_type.c \
-                     writer_setState.c reader_bytes.c reader_MEFlag.c writer_closeRecord.c
+                     writer_setState.c reader_bytes.c reader_MEFlag.c writer_closeRecord.c \
+                     reader_finishReading.c writer_finishWriting.c reader_readDataNonBlocking.c \
+                     reader_latticeParallelNonBlocking.c writer_latticeParallelNonBlocking.c \
+                     writer_recordDataNonBlocking.c
 
 all: all-am
 
@@ -258,11 +266,14 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/reader_closeRecord.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/reader_construct.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/reader_destroy.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/reader_finishReading.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/reader_getPointer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/reader_latticeParallel.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/reader_latticeParallelNonBlocking.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/reader_nextRecord.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/reader_padBytes.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/reader_readData.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/reader_readDataNonBlocking.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/reader_seek.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/reader_setPointer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/reader_setState.Po@am__quote@
@@ -270,8 +281,11 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/writer_closeRecord.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/writer_construct.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/writer_destroy.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/writer_finishWriting.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/writer_latticeParallel.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/writer_latticeParallelNonBlocking.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/writer_recordData.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/writer_recordDataNonBlocking.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/writer_recordHeader.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/writer_seek.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/writer_setState.Po@am__quote@

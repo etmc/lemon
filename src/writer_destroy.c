@@ -3,6 +3,9 @@
 
 int lemonDestroyWriter(LemonWriter *writer)
 {
+  if (writer->is_busy)
+    lemonFinishWriting(writer);
+
   if (writer == (LemonWriter*)NULL)
     return LEMON_SUCCESS;
 

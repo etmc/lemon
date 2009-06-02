@@ -1,6 +1,6 @@
 #pragma once
 
-static int lemon_padding(size_t nbytes)
+static inline int lemon_padding(size_t nbytes)
 {
   return (8 - (nbytes % 8)) % 8;
 }

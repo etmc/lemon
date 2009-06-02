@@ -26,6 +26,8 @@
  * please contact A. Deuzeman (a.deuzeman@rug.nl)                           *
  ****************************************************************************/
 
+#include <stdint.h>
+
 typedef struct
 {
   unsigned int lemon_version;
