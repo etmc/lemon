@@ -11,10 +11,10 @@
 
 static int readAndParseHeader(LemonReader *reader)
 {
-  unsigned int i_version;
-  int i_MB, i_ME;
-  uint32_t i_magic_no;
-  uint64_t  i_data_length;
+  unsigned int version;
+  int MB, ME;
+  uint32_t magic_no;
+  uint64_t  data_length;
   unsigned char *typebuf;
   MPI_Status status;
   int err;
@@ -59,30 +59,30 @@ static int readAndParseHeader(LemonReader *reader)
   }
 
   /* Check magic number */
-  i_magic_no = big_endian_long(*lemon_hdr_magic_no);
-  if(i_magic_no != LEMON_MAGIC_NO)
+  magic_no = big_endian_long(*lemon_hdr_magic_no);
+  if(magic_no != LEMON_MAGIC_NO)
   {
     fprintf(stderr, "[LEMON] Node %d reports in readAndParseHeader:\n"
-                    "        read %x for magic number, expected %x.\n", reader->my_rank, i_magic_no, LEMON_MAGIC_NO);
+                    "        read %x for magic number, expected %x.\n", reader->my_rank, magic_no, LEMON_MAGIC_NO);
     return LEMON_ERR_HEADER_NEXT;
   }
 
   /* LEMON version number */
-  i_version = big_endian_short(*lemon_hdr_version);
+  version = big_endian_short(*lemon_hdr_version);
 
   /* Message flags */
-  i_MB = (*lemon_hdr_mbme & MB_MASK) ? 1 : 0;
-  i_ME = (*lemon_hdr_mbme & ME_MASK) ? 1 : 0;
+  MB = (*lemon_hdr_mbme & MB_MASK) ? 1 : 0;
+  ME = (*lemon_hdr_mbme & ME_MASK) ? 1 : 0;
 
   /* Data length */
-  i_data_length = big_endian_long_long(*lemon_hdr_data_len);
+  data_length = big_endian_long_long(*lemon_hdr_data_len);
 
   /* Record type. */
   typebuf = (unsigned char *)lemon_hdr_rec_type;
 
   /* Sanity Checking */
   MPI_Barrier(reader->cartesian);
-  reader->curr_header = lemonCreateHeader(i_MB, i_ME, (char*)typebuf, i_data_length);
+  reader->curr_header = lemonCreateHeader(MB, ME, (char*)typebuf, data_length);
   if (reader->curr_header == (LemonRecordHeader *)NULL )
   {
     fprintf(stderr, "[LEMON] Node %d reports in readAndParseHeader:\n"
