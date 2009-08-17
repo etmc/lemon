@@ -23,6 +23,7 @@ int main(int argc, char **argv)
   /* The following are the local volumes - we extend the lattice as needed. */
   int latSizes[] = {4, 4, 4, 4};
   int latVol = 256;
+  int const mapping[] = {0, 3, 1, 2};
 
   MPI_Comm cartesian;
   int i;
@@ -51,7 +52,7 @@ int main(int argc, char **argv)
 
   lemonDestroyHeader(h);
 
-  lemonWriteLatticeParallel(w, data, sizeof(char), latSizes);
+  lemonWriteLatticeParallelMapped(w, data, sizeof(char), latSizes, mapping);
 
   lemonWriterCloseRecord(w);
   lemonDestroyWriter(w);
@@ -70,7 +71,7 @@ int main(int argc, char **argv)
   if (strncmp(type, "parallel-test", 13))
     fprintf(stderr, "Node %d reports: wrong type read.\n", rank);
 
-  lemonReadLatticeParallel(r, data_read, sizeof(char), latSizes);
+  lemonReadLatticeParallelMapped(r, data_read, sizeof(char), latSizes, mapping);
   data_read[256] = '\0';
   if (strncmp(data_read, data, 256))
   {

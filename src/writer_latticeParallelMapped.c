@@ -20,9 +20,9 @@ int lemonWriteLatticeParallelMapped(LemonWriter *writer, void *data,
   int *localDims;
   int *mpiDims;
   int *mpiCoords;
+  int *mappedDims;
   int *period;
   int written;
-  int *mappedDims;
 
   if (writer == (LemonWriter*)NULL || data == NULL || siteSize == 0 || latticeDims == (int*)NULL)
   {
@@ -46,22 +46,22 @@ int lemonWriteLatticeParallelMapped(LemonWriter *writer, void *data,
   localDims = (int*)malloc(ndims * sizeof(int));
   mpiDims = (int*)malloc(ndims * sizeof(int));
   mpiCoords = (int*)malloc(ndims * sizeof(int));
+  mappedDims = (int*)malloc(ndims * sizeof(int));
   period = (int*)malloc(ndims * sizeof(int));
   MPI_Cart_get(writer->cartesian, ndims, mpiDims, period, mpiCoords);
   free(period);
-  mappedDims = (int*)malloc(ndims * sizeof(int));
   
   /* Calculation of local lattice dimensions from the MPI data we obtained. */
   for (idx = 0; idx < ndims; ++idx)
   {
     mappedDims[idx] = latticeDims[mapping[idx]];
-    localDims[idx] = mappedDims[idx] / mpiDims[mapping[idx]];
-    localVol *= localDims[mapping[idx]];
-    totalVol *= mappedDims[idx];
-    starts[idx] = localDims[mapping[idx]] * mpiCoords[mapping[idx]];
+    localDims[idx]  = mappedDims[idx] / mpiDims[mapping[idx]];
+    localVol       *= localDims[idx];
+    totalVol       *= mappedDims[idx];
+    starts[idx]     = localDims[idx] * mpiCoords[mapping[idx]];
   }
 
-  /* Build up a filetype that provides the right offsets for the writing of a N-dimensional lattice. */
+  /* Build up a filetype that provides the right offsets for the writing of an N-dimensional lattice. */
   MPI_Type_create_subarray(ndims, mappedDims, localDims, starts, MPI_ORDER_C, etype, &ftype);
   MPI_Type_commit(&ftype);
 
@@ -88,6 +88,7 @@ int lemonWriteLatticeParallelMapped(LemonWriter *writer, void *data,
   free(localDims);
   free(mpiDims);
   free(mpiCoords);
+  free(mappedDims);
 
   MPI_Get_count(&status, MPI_BYTE, &written);
   if (written != siteSize * localVol)

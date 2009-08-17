@@ -70,6 +70,8 @@ am_liblemon_a_OBJECTS = header_construct.$(OBJEXT) \
 	reader_readDataNonBlocking.$(OBJEXT) \
 	reader_latticeParallelNonBlocking.$(OBJEXT) \
 	writer_latticeParallelNonBlocking.$(OBJEXT) \
+	writer_latticeParallelMapped.$(OBJEXT) \
+	reader_latticeParallelMapped.$(OBJEXT) \
 	writer_recordDataNonBlocking.$(OBJEXT)
 liblemon_a_OBJECTS = $(am_liblemon_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/include
@@ -182,7 +184,7 @@ liblemon_a_SOURCES = header_construct.c reader_closeRecord.c \
                      writer_setState.c reader_bytes.c reader_MEFlag.c writer_closeRecord.c \
                      reader_finishReading.c writer_finishWriting.c reader_readDataNonBlocking.c \
                      reader_latticeParallelNonBlocking.c writer_latticeParallelNonBlocking.c \
-                     writer_recordDataNonBlocking.c
+                     writer_latticeParallelMapped.c reader_latticeParallelMapped.c writer_recordDataNonBlocking.c
 
 all: all-am
 
@@ -269,6 +271,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/reader_finishReading.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/reader_getPointer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/reader_latticeParallel.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/reader_latticeParallelMapped.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/reader_latticeParallelNonBlocking.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/reader_nextRecord.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/reader_padBytes.Po@am__quote@
@@ -283,6 +286,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/writer_destroy.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/writer_finishWriting.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/writer_latticeParallel.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/writer_latticeParallelMapped.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/writer_latticeParallelNonBlocking.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/writer_recordData.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/writer_recordDataNonBlocking.Po@am__quote@

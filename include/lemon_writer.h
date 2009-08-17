@@ -70,6 +70,6 @@ int lemonWriterSetState(LemonWriter *wdest, LemonWriter *wsrc);
 /* Additions for LEMON follow */
 int lemonWriteLatticeParallel(LemonWriter *writer, void *data, MPI_Offset siteSize, int *latticeDims);
 int lemonWriteLatticeParallelNonBlocking(LemonWriter *writer, void *data, MPI_Offset siteSize, int *latticeDims);
-int lemonWriteLatticeParallelMapped(LemonWriter *writer, void *data, MPI_Offset siteSize, int *latticeDims, int* mapping)
+int lemonWriteLatticeParallelMapped(LemonWriter *writer, void *data, MPI_Offset siteSize, int *latticeDims, int const *mapping);
 int lemonWriteRecordDataNonBlocking(void *source, uint64_t nbytes, LemonWriter* writer);
 int lemonFinishWriting(LemonWriter *writer);

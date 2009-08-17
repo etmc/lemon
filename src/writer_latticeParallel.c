@@ -55,7 +55,7 @@ int lemonWriteLatticeParallel(LemonWriter *writer, void *data,
     starts[idx] = localDims[idx] * mpiCoords[idx];
   }
 
-  /* Build up a filetype that provides the right offsets for the writing of a N-dimensional lattice. */
+  /* Build up a filetype that provides the right offsets for the writing of an N-dimensional lattice. */
   MPI_Type_create_subarray(ndims, latticeDims, localDims, starts, MPI_ORDER_C, etype, &ftype);
   MPI_Type_commit(&ftype);
 
