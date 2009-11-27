@@ -34,7 +34,7 @@
 typedef struct
 {
   /* Binary structure */
-  MPI_File *fh;
+  MPI_File *fp;
   LemonRecordHeader *curr_header;
 
   /* Communicator setup */

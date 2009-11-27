@@ -32,7 +32,7 @@
 typedef struct
 {
   /* Binary structure */
-  MPI_File* fh;
+  MPI_File* fp;
 
   /* Communicator setup */
   MPI_Comm cartesian;
@@ -58,7 +58,7 @@ typedef struct
 } LemonWriter;
 
 /* Writer manipulators */
-LemonWriter* lemonCreateWriter(MPI_File *fh, MPI_Comm cartesian);
+LemonWriter* lemonCreateWriter(MPI_File *fp, MPI_Comm cartesian);
 int lemonDestroyWriter(LemonWriter *writer);
 int lemonWriteRecordHeader(LemonRecordHeader *props, LemonWriter* writer);
 int lemonWriteRecordData(void *source, uint64_t *nbytes,  LemonWriter* writer);

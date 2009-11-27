@@ -15,11 +15,11 @@ int lemonFinishReading(LemonReader *reader)
 
   MPI_Comm_size(reader->cartesian, &size);
 
-  MPI_File_read_at_all_end(*reader->fh, reader->buffer, &status);
+  MPI_File_read_at_all_end(*reader->fp, reader->buffer, &status);
 
   reader->pos += reader->bytes_wanted;
-  MPI_File_set_view(*reader->fh, reader->off, MPI_BYTE, MPI_BYTE, "native", MPI_INFO_NULL);
-  MPI_File_seek(*reader->fh, reader->pos, MPI_SEEK_SET);
+  MPI_File_set_view(*reader->fp, reader->off, MPI_BYTE, MPI_BYTE, "native", MPI_INFO_NULL);
+  MPI_File_seek(*reader->fp, reader->pos, MPI_SEEK_SET);
 
   MPI_Get_count(&status, MPI_BYTE, &read);
 

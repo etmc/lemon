@@ -70,11 +70,11 @@ int lemonReadLatticeParallel(LemonReader *reader, void *data,
 
   /* Install the data organization we worked out above on the file as a view.
      We keep the individual file pointers synchronized explicitly, so assume they are here. */
-  MPI_File_set_view(*reader->fh, reader->off + reader->pos,
+  MPI_File_set_view(*reader->fp, reader->off + reader->pos,
                      etype, ftype, "native", MPI_INFO_NULL);
 
   /* Blast away! */
-  MPI_File_read_at_all(*reader->fh, reader->pos, data, localVol, etype, &status);
+  MPI_File_read_at_all(*reader->fp, reader->pos, data, localVol, etype, &status);
   MPI_Barrier(reader->cartesian);
 
   MPI_Get_count(&status, MPI_BYTE, &read);
@@ -84,7 +84,7 @@ int lemonReadLatticeParallel(LemonReader *reader, void *data,
   /* We want to leave the file in a well-defined state, so we reset the view to a default. */
   /* We don't want to reread any data, so we maximize the file pointer globally. */
   MPI_Barrier(reader->cartesian);
-  MPI_File_set_view(*reader->fh, 0, MPI_BYTE, MPI_BYTE, "native", MPI_INFO_NULL);
+  MPI_File_set_view(*reader->fp, 0, MPI_BYTE, MPI_BYTE, "native", MPI_INFO_NULL);
 
   /* Free up the resources we claimed for this operation. */
   MPI_Type_free(&etype);

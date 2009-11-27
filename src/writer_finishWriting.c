@@ -14,13 +14,13 @@ int lemonFinishWriting(LemonWriter *writer)
     return LEMON_SUCCESS;
 
   if (writer->is_collective)
-    MPI_File_write_at_all_end(*writer->fh, writer->buffer, &status);
+    MPI_File_write_at_all_end(*writer->fp, writer->buffer, &status);
   else if (writer->my_rank == 0)
     MPI_Wait(&writer->request, &status);
 
   writer->pos += writer->bytes_wanted;
-  MPI_File_set_view(*writer->fh, writer->off, MPI_BYTE, MPI_BYTE, "native", MPI_INFO_NULL);
-  MPI_File_seek(*writer->fh, writer->pos, MPI_SEEK_SET);
+  MPI_File_set_view(*writer->fp, writer->off, MPI_BYTE, MPI_BYTE, "native", MPI_INFO_NULL);
+  MPI_File_seek(*writer->fp, writer->pos, MPI_SEEK_SET);
 
   MPI_Get_count(&status, MPI_BYTE, &written);
 

@@ -1,18 +1,18 @@
 #include <config.h>
 #include <lemon.h>
 
-LemonWriter* lemonCreateWriter(MPI_File *fh, MPI_Comm cartesian)
+LemonWriter* lemonCreateWriter(MPI_File *fp, MPI_Comm cartesian)
 {
   LemonWriter* result;
 
-  if (fh == (MPI_File*)NULL)
+  if (fp == (MPI_File*)NULL)
     return NULL;
 
   result = (LemonWriter *)malloc(sizeof(LemonWriter));
   if (result == (LemonWriter *)NULL)
     return NULL;
 
-  result->fh = fh;
+  result->fp = fp;
 
   result->is_awaiting_header = 1;
   result->is_busy = 0;

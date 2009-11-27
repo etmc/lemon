@@ -69,11 +69,11 @@ int lemonReadLatticeParallelNonBlocking(LemonReader *reader, void *data,
 
   /* Install the data organization we worked out above on the file as a view.
      We keep the individual file pointers synchronized explicitly, so assume they are here. */
-  MPI_File_set_view(*reader->fh, reader->off + reader->pos,
+  MPI_File_set_view(*reader->fp, reader->off + reader->pos,
                      etype, ftype, "native", MPI_INFO_NULL);
 
   /* Blast away! */
-  err = MPI_File_read_at_all_begin(*reader->fh, reader->pos, data, localVol, etype);
+  err = MPI_File_read_at_all_begin(*reader->fp, reader->pos, data, localVol, etype);
   reader->is_busy = 1;
   reader->is_striped = 1;
   reader->buffer = data;

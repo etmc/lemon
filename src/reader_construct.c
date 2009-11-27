@@ -1,7 +1,7 @@
 #include <config.h>
 #include <lemon.h>
 
-LemonReader* lemonCreateReader(MPI_File *fh, MPI_Comm cartesian)
+LemonReader* lemonCreateReader(MPI_File *fp, MPI_Comm cartesian)
 {
   LemonReader *result;
 
@@ -9,7 +9,7 @@ LemonReader* lemonCreateReader(MPI_File *fh, MPI_Comm cartesian)
   if (result == (LemonReader*)NULL)
     return (LemonReader*)NULL;
 
-  result->fh = fh;
+  result->fp = fp;
   result->curr_header = (LemonRecordHeader*)NULL;
 
   result->is_last = 0;

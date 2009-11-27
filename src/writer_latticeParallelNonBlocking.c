@@ -64,10 +64,10 @@ int lemonWriteLatticeParallelNonBlocking(LemonWriter *writer, void *data,
      take the global maximum of all MPI_long File filepointers in absolute offsets and
      start our writeout operation from there. */
   MPI_Barrier(writer->cartesian);
-  MPI_File_set_view(*writer->fh, writer->off + writer->pos, etype, ftype, "native", MPI_INFO_NULL);
+  MPI_File_set_view(*writer->fp, writer->off + writer->pos, etype, ftype, "native", MPI_INFO_NULL);
 
   /* Blast away! */
-  err = MPI_File_write_at_all_begin(*writer->fh, writer->pos, data, localVol, etype);
+  err = MPI_File_write_at_all_begin(*writer->fp, writer->pos, data, localVol, etype);
   writer->is_busy = 1;
   writer->is_collective = 1;
   writer->buffer = data;

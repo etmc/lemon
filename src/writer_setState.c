@@ -22,9 +22,9 @@ int lemonWriterSetState(LemonWriter *wdest, LemonWriter *wsrc)
   wdest->data_length        = wsrc->data_length;
 
   /* Now make the system state agree with the writer state */
-  MPI_File_get_view(*wsrc->fh, &disp, &etype, &ftype, drep);
-  MPI_File_set_view(*wdest->fh, disp, etype, ftype, drep, MPI_INFO_NULL);
-  MPI_File_seek_shared(*wdest->fh, wdest->pos, MPI_SEEK_CUR);
+  MPI_File_get_view(*wsrc->fp, &disp, &etype, &ftype, drep);
+  MPI_File_set_view(*wdest->fp, disp, etype, ftype, drep, MPI_INFO_NULL);
+  MPI_File_seek_shared(*wdest->fp, wdest->pos, MPI_SEEK_CUR);
   MPI_Barrier(wdest->cartesian);
 
   MPI_Comm_dup(wsrc->cartesian, &wdest->cartesian);

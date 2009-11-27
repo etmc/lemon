@@ -25,9 +25,9 @@ int lemonReaderSetState(LemonReader *rdest, LemonReader *rsrc)
   rdest->pos                = rsrc->pos;
 
   /* Now make the system agree with the reader state */
-  MPI_File_get_view(*rsrc->fh, &disp, &etype, &ftype, drep);
-  MPI_File_set_view(*rdest->fh, disp, etype, ftype, drep, MPI_INFO_NULL);
-  MPI_File_seek(*rdest->fh, rdest->pos, MPI_SEEK_SET);
+  MPI_File_get_view(*rsrc->fp, &disp, &etype, &ftype, drep);
+  MPI_File_set_view(*rdest->fp, disp, etype, ftype, drep, MPI_INFO_NULL);
+  MPI_File_seek(*rdest->fp, rdest->pos, MPI_SEEK_SET);
 
   MPI_Comm_dup(rsrc->cartesian, &rdest->cartesian);
   MPI_Comm_rank(rdest->cartesian, &rdest->my_rank);

@@ -65,11 +65,11 @@ int lemonWriteLatticeParallel(LemonWriter *writer, void *data,
      take the global maximum of all MPI_long File filepointers in absolute offsets and
      start our writeout operation from there. */
   MPI_Barrier(writer->cartesian);
-  MPI_File_set_view(*writer->fh, writer->off + writer->pos, etype, ftype, "native", MPI_INFO_NULL);
+  MPI_File_set_view(*writer->fp, writer->off + writer->pos, etype, ftype, "native", MPI_INFO_NULL);
 
   /* Blast away! */
-  MPI_File_write_at_all(*writer->fh, writer->pos, data, localVol, etype, &status);
-  MPI_File_sync(*writer->fh);
+  MPI_File_write_at_all(*writer->fp, writer->pos, data, localVol, etype, &status);
+  MPI_File_sync(*writer->fp);
 
   MPI_Barrier(writer->cartesian);
 
@@ -77,7 +77,7 @@ int lemonWriteLatticeParallel(LemonWriter *writer, void *data,
 
   /* We should reset the shared file pointer, in an MPI_BYTE based view... */
   MPI_Barrier(writer->cartesian);
-  MPI_File_set_view(*writer->fh, 0, MPI_BYTE, MPI_BYTE, "native", MPI_INFO_NULL);
+  MPI_File_set_view(*writer->fp, 0, MPI_BYTE, MPI_BYTE, "native", MPI_INFO_NULL);
 
   /* Free up the resources we claimed for this operation. */
   MPI_Type_free(&etype);

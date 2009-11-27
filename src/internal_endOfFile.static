@@ -13,7 +13,7 @@ static int endOfFile(LemonReader *reader)
 
   if (reader->my_rank == 0)
   {
-    MPI_File_read_at(*reader->fh, reader->off + reader->pos, &test, 1, MPI_UNSIGNED_CHAR, &stat);
+    MPI_File_read_at(*reader->fp, reader->off + reader->pos, &test, 1, MPI_UNSIGNED_CHAR, &stat);
     MPI_Get_count(&stat, MPI_CHAR, &read);
   }
   MPI_Bcast(&read, 1, MPI_INT, 0, reader->cartesian);

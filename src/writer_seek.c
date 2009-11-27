@@ -25,7 +25,7 @@ int lemonWriterSeek(LemonWriter *writer, MPI_Offset offset, int whence)
   else
     return LEMON_ERR_PARAM;
 
-  err = MPI_File_seek(*writer->fh, writer->pos, MPI_SEEK_SET);
+  err = MPI_File_seek(*writer->fp, writer->pos, MPI_SEEK_SET);
   MPI_Barrier(writer->cartesian);
 
   if (err != MPI_SUCCESS)

@@ -32,13 +32,13 @@ int lemonWriterCloseRecord(LemonWriter *writer)
     lemonFinishWriting(writer);
 
   /* Advance to end of record */
-  MPI_File_seek_shared(*writer->fh, writer->data_length, MPI_SEEK_SET);
+  MPI_File_seek_shared(*writer->fp, writer->data_length, MPI_SEEK_SET);
 
   /* Padding */
   pad = lemon_padding(writer->data_length);
   if (pad > 0 && writer->my_rank == 0)
-    MPI_File_write_at(*writer->fh, writer->off + writer->pos, padbuf, pad, MPI_BYTE, &status);
-  MPI_File_sync(*writer->fh);
+    MPI_File_write_at(*writer->fp, writer->off + writer->pos, padbuf, pad, MPI_BYTE, &status);
+  MPI_File_sync(*writer->fp);
 
   /* Clean up now */
   MPI_Barrier(writer->cartesian);

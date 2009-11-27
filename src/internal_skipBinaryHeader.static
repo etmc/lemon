@@ -1,9 +1,9 @@
 #pragma once
 
-static int skipLemonRecordBinaryHeader(MPI_File *fh)
+static int skipLemonRecordBinaryHeader(MPI_File *fp)
 {
   int err;
-  err = MPI_File_seek(*fh, (MPI_Offset)HDR_SIZE_BYTES, MPI_SEEK_CUR);
+  err = MPI_File_seek(*fp, (MPI_Offset)HDR_SIZE_BYTES, MPI_SEEK_CUR);
   if (err == MPI_SUCCESS)
     return LEMON_SUCCESS;
   return LEMON_ERR_SEEK;

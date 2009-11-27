@@ -13,7 +13,7 @@ int lemonReaderReadDataNonBlocking(void *dest, uint64_t nbytes, LemonReader *rea
     return LEMON_ERR_PARAM;
   }
 
-  err = MPI_File_read_at_all_begin(*reader->fh, reader->off + reader->pos, dest, nbytes, MPI_BYTE);
+  err = MPI_File_read_at_all_begin(*reader->fp, reader->off + reader->pos, dest, nbytes, MPI_BYTE);
 
   if (err != MPI_SUCCESS)
   {

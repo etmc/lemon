@@ -34,7 +34,7 @@ static int readAndParseHeader(LemonReader *reader)
   if (endOfFile(reader))
     return LEMON_EOF;
 
-  err = MPI_File_read_at_all(*reader->fh, reader->off + reader->pos, lemon_header.int64, HDR_SIZE_BYTES, MPI_BYTE, &status);
+  err = MPI_File_read_at_all(*reader->fp, reader->off + reader->pos, lemon_header.int64, HDR_SIZE_BYTES, MPI_BYTE, &status);
 
 
   if (err)

@@ -28,7 +28,7 @@ int lemonReaderSeek(LemonReader *reader, MPI_Offset offset, int whence)
     return LEMON_ERR_PARAM;
   }
 
-  err = MPI_File_seek(*reader->fh, reader->pos, MPI_SEEK_SET);
+  err = MPI_File_seek(*reader->fp, reader->pos, MPI_SEEK_SET);
 
   if (err != MPI_SUCCESS)
   {
