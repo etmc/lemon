@@ -1,0 +1,23 @@
+#pragma once
+
+static int lemonClearWriterState(LemonWriter *writer)
+{
+  /* Deal with the current reader state */
+  if (reader == (LemonReader*)NULL)
+  {
+    fprintf(stderr, "[LEMON] Node %d reports in lemonClearWriterState:\n"
+                    "        NULL pointer provided.\n", writer->my_rank);
+    return LEMON_ERR_PARAM;
+  }
+
+  if (writer->is_awaiting_header)
+  {
+    fprintf(stderr, "[LEMON] Node %d reports in lemonClearWriterState:\n"
+                    "        uninitialized reader provided.\n", writer->my_rank);
+    return LEMON_ERR_WRITE;
+  }
+
+  lemonFinishWriting(writer);
+
+  return LEMON_SUCCESS;
+}

@@ -1,0 +1,46 @@
+#pragma once
+
+static void lemonSetupIOTypes(LemonSetup *setup, MPI_Comm *cartesian, MPI_Offset siteSize, int *latticeDims, int const *mapping)
+{
+  int idx = 0;
+  int *mpiDims = (int*)NULL;
+  int *period  = (int*)NULL;
+
+  /* Set up data types and file view */
+  /* Elementary datatype for reading/writing: a single lattice site of the correct size.
+     Note that we always assume we obtained this as raw binary data of the correct type,
+     because apparently we cannot trust MPI libraries to deal with conversions internally. */
+  MPI_Type_contiguous(siteSize, MPI_BYTE, &setup->etype);
+  MPI_Type_commit(&setup->etype);
+
+  /* Gathering of the required MPI data from the cartesian communicator. */
+  MPI_Cartdim_get(cartesian, &setup->ndims);
+  setup->starts = (int*)malloc(setup->ndims * sizeof(int));
+  setup->localDims = (int*)malloc(setup->ndims * sizeof(int));
+  setup->mappedDims = (int*)malloc(setup->ndims * sizeof(int));
+  setup->mpiDims = (int*)malloc(setup->ndims * sizeof(int));
+
+  mpiCoords = (int*)malloc(setup->ndims * sizeof(int));
+  mpiDims = (int*)malloc(ndims * sizeof(int));
+  period  = (int*)malloc(ndims * sizeof(int));
+
+  MPI_Cart_get(cartesian, setup->ndims, mpiDims, period, mpiCoords);
+
+  /* Calculation of local lattice dimensions from the MPI data we obtained. */
+  for (idx = 0; idx < ndims; ++idx)
+  {
+    setup->mappedDims[idx]  = latticeDims[mapping[idx]];
+    setup->localDims[idx]   = setup->mappedDims[idx] / mpiDims[mapping[idx]];
+    setup->localVol        *= setup->localDims[idx];
+    setup->totalVol        *= setup->mappedDims[idx];
+    setup->starts[idx]      = setup->localDims[idx] * mpiCoords[mapping[idx]];
+  }
+  free(period);
+  free(mpiDims);
+  free(mpiCoords);
+
+  /* Build up a filetype that provides the right offsets for the reading of a N-dimensional lattice. */
+  MPI_Type_create_subarray(setup->ndims, setup->mappedDims, setup->localDims, setup->starts,
+			   MPI_ORDER_C, setup->etype, &setup->ftype);
+  MPI_Type_commit(&setup->ftype);
+}

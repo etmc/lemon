@@ -1,0 +1,21 @@
+#pragma once
+
+static int lemonClearReaderState(LemonReader *reader)
+{
+  /* Deal with the current reader state */
+  if (reader == (LemonReader*)NULL)
+  {
+    fprintf(stderr, "[LEMON] Node %d reports in lemonClearReaderState:\n"
+                    "        NULL pointer provided.\n", reader->my_rank);
+    return LEMON_ERR_PARAM;
+  }
+
+  if (reader->is_awaiting_header)
+  {
+    fprintf(stderr, "[LEMON] Node %d reports in lemonClearReaderState:\n"
+                    "        uninitialized reader provided.\n", reader->my_rank);
+    return LEMON_ERR_READ;
+  }
+
+  return lemonFinishReading(reader);
+}

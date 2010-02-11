@@ -1,0 +1,11 @@
+#pragma once
+
+static void lemonFreeIOTypes(LemonSetup *setup)
+{
+  /* Free up the resources. */
+  MPI_Type_free(&setup->etype);
+  MPI_Type_free(&setup->ftype);
+  free(setup->starts);
+  free(setup->localDims);
+  free(setup->mappedDims);
+}

@@ -76,12 +76,10 @@ int lemonReaderSetState(LemonReader *rdest, LemonReader *rsrc);
 int lemonEOM(LemonReader *reader);
 
 /* Additions for LEMON follow */
-int lemonReadLatticeParallel(LemonReader *reader, void *data,
-                             MPI_Offset siteSize, int *latticeDims);
-int lemonReadLatticeParallelMapped(LemonReader *reader, void *data,
-		           MPI_Offset siteSize, int *latticeDims, int const *mapping);
-int lemonReadLatticeParallelNonBlocking(LemonReader *reader, void *data,
-                                        MPI_Offset siteSize, int *latticeDims);
+int lemonReadLatticeParallel(LemonReader *reader, void *data, MPI_Offset siteSize, int *latticeDims);
+int lemonReadLatticeParallelMapped(LemonReader *reader, void *data, MPI_Offset siteSize, int *latticeDims, int const *mapping);
+int lemonReadLatticeParallelNonBlocking(LemonReader *reader, void *data, MPI_Offset siteSize, int *latticeDims);
+int lemonReadLatticeParallelNonBlockingMapped(LemonReader *reader, void *data, MPI_Offset siteSize, int *latticeDims, int const *mapping);
 int lemonReaderReadDataNonBlocking(void *dest, uint64_t nbytes, LemonReader *reader);
 int lemonFinishReading(LemonReader *reader);
 
