@@ -1,5 +1,7 @@
 #pragma once
 
+#include <lemon_reader.h>
+
 static int lemonClearReaderState(LemonReader *reader)
 {
   /* Deal with the current reader state */

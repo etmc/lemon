@@ -1,8 +1,9 @@
 #pragma once
 
-static void lemonSetupIOTypes(LemonSetup *setup, MPI_Comm *cartesian, MPI_Offset siteSize, int *latticeDims, int const *mapping)
+static void lemonSetupIOTypes(LemonSetup *setup, MPI_Comm cartesian, MPI_Offset siteSize, int *latticeDims, int const *mapping)
 {
   int idx = 0;
+  int *mpiCoords = (int*)NULL;
   int *mpiDims = (int*)NULL;
   int *period  = (int*)NULL;
 
@@ -21,13 +22,13 @@ static void lemonSetupIOTypes(LemonSetup *setup, MPI_Comm *cartesian, MPI_Offset
   setup->mpiDims = (int*)malloc(setup->ndims * sizeof(int));
 
   mpiCoords = (int*)malloc(setup->ndims * sizeof(int));
-  mpiDims = (int*)malloc(ndims * sizeof(int));
-  period  = (int*)malloc(ndims * sizeof(int));
+  mpiDims = (int*)malloc(setup->ndims * sizeof(int));
+  period  = (int*)malloc(setup->ndims * sizeof(int));
 
   MPI_Cart_get(cartesian, setup->ndims, mpiDims, period, mpiCoords);
 
   /* Calculation of local lattice dimensions from the MPI data we obtained. */
-  for (idx = 0; idx < ndims; ++idx)
+  for (idx = 0; idx < setup->ndims; ++idx)
   {
     setup->mappedDims[idx]  = latticeDims[mapping[idx]];
     setup->localDims[idx]   = setup->mappedDims[idx] / mpiDims[mapping[idx]];

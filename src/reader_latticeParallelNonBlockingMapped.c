@@ -2,6 +2,7 @@
 #include <lemon.h>
 #include <stdio.h>
 
+#include "internal_LemonSetup.ih"
 #include "internal_clearReaderState.static"
 #include "internal_setupIOType.static"
 #include "internal_freeIOType.static"

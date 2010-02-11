@@ -2,9 +2,10 @@
 #include <lemon.h>
 #include <stdio.h>
 
+#include "internal_LemonSetup.ih"
 #include "internal_clearReaderState.static"
-#include "internal_setupIOType.static"
-#include "internal_freeIOType.static"
+#include "internal_setupIOTypes.static"
+#include "internal_freeIOTypes.static"
 
 int lemonReadLatticeParallelMapped(LemonReader *reader, void *data, MPI_Offset siteSize,
                                    int *latticeDims, int const *mapping)
@@ -30,17 +31,17 @@ int lemonReadLatticeParallelMapped(LemonReader *reader, void *data, MPI_Offset s
 
   /* Synchronize the file pointer */
   MPI_Get_count(&status, MPI_BYTE, &read);
-  reader->pos += totalVol * siteSize;
+  reader->pos += setup.totalVol * siteSize;
 
   /* We want to leave the file in a well-defined state, so we reset the view to a default. */
   /* We don't want to reread any data, so we maximize the file pointer globally. */
   MPI_Barrier(reader->cartesian);
   MPI_File_set_view(*reader->fp, 0, MPI_BYTE, MPI_BYTE, "native", MPI_INFO_NULL);
 
-  lemonFreeIOTypes(&setup, reader);
+  lemonFreeIOTypes(&setup);
 
   /* Doing a data read should never get us to EOF, only header scanning -- any shortfall is an error*/
-  if (read != siteSize * localVol)
+  if (read != siteSize * setup.localVol)
   {
     fprintf(stderr, "[LEMON] Node %d reports in lemonReadLatticeParallel:\n"
                     "        Could not read the required amount of data.\n", reader->my_rank);

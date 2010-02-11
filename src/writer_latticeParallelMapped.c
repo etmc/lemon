@@ -2,14 +2,15 @@
 #include <lemon.h>
 #include <stdio.h>
 
+#include "internal_LemonSetup.ih"
 #include "internal_clearWriterState.static"
-#include "internal_setupIOType.static"
-#include "internal_freeIOType.static"
+#include "internal_setupIOTypes.static"
+#include "internal_freeIOTypes.static"
 
 int lemonWriteLatticeParallelMapped(LemonWriter *writer, void *data,
                                     MPI_Offset siteSize, int *latticeDims, int const *mapping)
 {
-  int        read;
+  int        written;
   int        error;
   MPI_Status status;
   LemonSetup setup;
@@ -40,7 +41,7 @@ int lemonWriteLatticeParallelMapped(LemonWriter *writer, void *data,
   lemonFreeIOTypes(&setup);
 
   MPI_Get_count(&status, MPI_BYTE, &written);
-  if (written != siteSize * localVol)
+  if (written != siteSize * setup.localVol)
   {
     fprintf(stderr, "[LEMON] Node %d reports in lemonWriteLatticeParallel:\n"
                     "        Could not write the required amount of data.\n", writer->my_rank);
