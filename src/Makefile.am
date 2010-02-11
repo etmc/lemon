@@ -12,4 +12,6 @@ liblemon_a_SOURCES = header_construct.c reader_closeRecord.c \
                      writer_setState.c reader_bytes.c reader_MEFlag.c writer_closeRecord.c \
                      reader_finishReading.c writer_finishWriting.c reader_readDataNonBlocking.c \
                      reader_latticeParallelNonBlocking.c writer_latticeParallelNonBlocking.c \
-                     writer_latticeParallelMapped.c reader_latticeParallelMapped.c writer_recordDataNonBlocking.c
+                     writer_latticeParallelMapped.c reader_latticeParallelMapped.c \
+                     writer_latticeParallelNonBlockingMapped.c reader_latticeParallelNonBlockingMapped.c \
+                     writer_recordDataNonBlocking.c

@@ -1,0 +1,17 @@
+#pragma once
+
+#include <mpi.h>
+
+typedef struct
+{
+  MPI_Datatype etype;
+  MPI_Datatype ftype;
+
+  int ndims;
+  int localVol;
+  int totalVol;
+
+  int *starts;
+  int *localDims;
+  int *mappedDims;
+} LemonSetup;

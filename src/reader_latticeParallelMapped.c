@@ -40,7 +40,7 @@ int lemonReadLatticeParallelMapped(LemonReader *reader, void *data, MPI_Offset s
 
   lemonFreeIOTypes(&setup);
 
-  /* Doing a data read should never get us to EOF, only header scanning -- any shortfall is an error*/
+  /* Doing a data read should never get us to EOF, only header scanning -- any shortfall is an error */
   if (read != siteSize * setup.localVol)
   {
     fprintf(stderr, "[LEMON] Node %d reports in lemonReadLatticeParallel:\n"
