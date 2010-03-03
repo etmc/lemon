@@ -21,7 +21,7 @@ LemonWriter* lemonCreateWriter(MPI_File *fp, MPI_Comm cartesian)
   result->is_last = 0;
   result->is_last_written = 0;
 
-  result->off = 0;
+  MPI_File_get_position(*(result->fp), &(result->off));
   result->pos = 0;
 
   MPI_Comm_dup(cartesian, &result->cartesian);
