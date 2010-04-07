@@ -39,7 +39,9 @@ int main(int argc, char **argv)
   MPI_Comm_rank(cartesian, &rank);
 
    /* Start of code - writing */
-  MPI_File_open(cartesian, "parallel.test", MPI_MODE_WRONLY | MPI_MODE_CREATE | MPI_MODE_APPEND, MPI_INFO_NULL, &fp);
+   /* Note that the following is the only way to truncate the file with MPI */
+  MPI_File_open(cartesian, "parallel.test", MPI_MODE_WRONLY | MPI_MODE_CREATE, MPI_INFO_NULL, &fp);
+  MPI_File_set_size(fp, 0);
   w = lemonCreateWriter(&fp, cartesian);
 
   data = (char*)malloc(257);
