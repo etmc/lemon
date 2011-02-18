@@ -2,7 +2,7 @@
 #include <lemon.h>
 #include <string.h>
 
-LemonRecordHeader *lemonCreateHeader(int MB_flag, int ME_flag, char const *type, uint64_t reclen)
+LemonRecordHeader *lemonCreateHeader(int MB_flag, int ME_flag, char const *type, MPI_Offset reclen)
 {
   LemonRecordHeader *result;
   size_t type_length;
@@ -23,7 +23,7 @@ LemonRecordHeader *lemonCreateHeader(int MB_flag, int ME_flag, char const *type,
   /* Fill out the rest of the fields */
   result->ME_flag = ME_flag;
   result->MB_flag = MB_flag;
-  result->data_length = reclen;
+  result->data_length = (uint64_t)reclen;
   result->lemon_version = LEMON_VERSION;
 
   return result;
