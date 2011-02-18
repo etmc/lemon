@@ -1,6 +1,6 @@
 #pragma once
 
-static void lemonSetupIOTypes(LemonSetup *setup, MPI_Comm cartesian, MPI_Offset siteSize, int *latticeDims, int const *mapping)
+static void lemonSetupIOTypes(LemonSetup *setup, MPI_Comm cartesian, MPI_Offset siteSize, int const *latticeDims, int const *mapping)
 {
   int idx = 0;
   int *mpiCoords = (int*)NULL;

@@ -1,7 +1,7 @@
 #include <config.h>
 #include <lemon.h>
 
-int lemonWriterSetState(LemonWriter *wdest, LemonWriter *wsrc)
+int lemonWriterSetState(LemonWriter *wdest, LemonWriter const *wsrc)
 {
   MPI_Offset   disp;
   MPI_Datatype etype;

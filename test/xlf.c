@@ -17,9 +17,9 @@ int main(int argc, char **argv)
   int ME_flag=1, MB_flag=1, status=0;
   char message[512];
   char message_read[512];
-  char *type;
-  uint64_t bytes;
-  uint64_t bytes_read;
+  char const *type;
+  MPI_Offset bytes;
+  MPI_Offset bytes_read;
   struct timeval t1;
 
   MPI_Init(&argc, &argv);

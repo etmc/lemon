@@ -2,13 +2,12 @@
 #include <lemon.h>
 #include <stdio.h>
 
-#include "internal_padding.static"
-
 int lemonFinishReading(LemonReader *reader)
 {
   int read;
   int size;
   MPI_Status status;
+  char MPImode[] = "native";
 
   if (!reader->is_busy)
     return LEMON_SUCCESS;
@@ -18,7 +17,7 @@ int lemonFinishReading(LemonReader *reader)
   MPI_File_read_at_all_end(*reader->fp, reader->buffer, &status);
 
   reader->pos += reader->bytes_wanted;
-  MPI_File_set_view(*reader->fp, reader->off, MPI_BYTE, MPI_BYTE, "native", MPI_INFO_NULL);
+  MPI_File_set_view(*reader->fp, reader->off, MPI_BYTE, MPI_BYTE, MPImode, MPI_INFO_NULL);
   MPI_File_seek(*reader->fp, reader->pos, MPI_SEEK_SET);
 
   MPI_Get_count(&status, MPI_BYTE, &read);

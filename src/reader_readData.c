@@ -2,7 +2,7 @@
 #include <lemon.h>
 #include <stdio.h>
 
-int lemonReaderReadData(void *dest, uint64_t *nbytes, LemonReader *reader)
+int lemonReaderReadData(void *dest, MPI_Offset *nbytes, LemonReader *reader)
 {
   MPI_Status status;
   int err;

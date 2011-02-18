@@ -4,7 +4,6 @@
 #include <lemon.h>
 
 #include "internal_readAndParseHeader.static"
-#include "internal_padding.static"
 
 int lemonReaderNextRecord(LemonReader *reader)
 {

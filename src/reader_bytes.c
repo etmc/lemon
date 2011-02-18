@@ -2,7 +2,7 @@
 #include <lemon.h>
 #include <stdio.h>
 
-uint64_t lemonReaderBytes(LemonReader *reader)
+MPI_Offset lemonReaderBytes(LemonReader *reader)
 {
   if (reader == (LemonReader*)NULL || reader->is_awaiting_header)
   {

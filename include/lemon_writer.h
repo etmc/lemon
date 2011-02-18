@@ -60,17 +60,17 @@ typedef struct
 /* Writer manipulators */
 LemonWriter* lemonCreateWriter(MPI_File *fp, MPI_Comm cartesian);
 int lemonDestroyWriter(LemonWriter *writer);
-int lemonWriteRecordHeader(LemonRecordHeader *props, LemonWriter* writer);
-int lemonWriteRecordData(void *source, uint64_t *nbytes,  LemonWriter* writer);
+int lemonWriteRecordHeader(LemonRecordHeader const *props, LemonWriter* writer);
+int lemonWriteRecordData(void *source, MPI_Offset *nbytes, LemonWriter* writer);
 
 int lemonWriterCloseRecord(LemonWriter *writer);
 int lemonWriterSeek(LemonWriter *writer, MPI_Offset offset, int whence);
-int lemonWriterSetState(LemonWriter *wdest, LemonWriter *wsrc);
+int lemonWriterSetState(LemonWriter *wdest, LemonWriter const *wsrc);
 
 /* Additions for LEMON follow */
-int lemonWriteLatticeParallel(LemonWriter *writer, void *data, MPI_Offset siteSize, int *latticeDims);
-int lemonWriteLatticeParallelNonBlocking(LemonWriter *writer, void *data, MPI_Offset siteSize, int *latticeDims);
-int lemonWriteLatticeParallelMapped(LemonWriter *writer, void *data, MPI_Offset siteSize, int *latticeDims, int const *mapping);
-int lemonWriteLatticeParallelNonBlockingMapped(LemonWriter *writer, void *data, MPI_Offset siteSize, int *latticeDims, int const *mapping);
-int lemonWriteRecordDataNonBlocking(void *source, uint64_t nbytes, LemonWriter* writer);
+int lemonWriteLatticeParallel(LemonWriter *writer, void *data, MPI_Offset siteSize, int const *latticeDims);
+int lemonWriteLatticeParallelNonBlocking(LemonWriter *writer, void *data, MPI_Offset siteSize, int const *latticeDims);
+int lemonWriteLatticeParallelMapped(LemonWriter *writer, void *data, MPI_Offset siteSize, int const *latticeDims, int const *mapping);
+int lemonWriteLatticeParallelNonBlockingMapped(LemonWriter *writer, void *data, MPI_Offset siteSize, int const *latticeDims, int const *mapping);
+int lemonWriteRecordDataNonBlocking(void *source, MPI_Offset const *nbytes, LemonWriter* writer);
 int lemonFinishWriting(LemonWriter *writer);

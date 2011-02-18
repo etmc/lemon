@@ -1,6 +1,6 @@
 #pragma once
 
-static inline int lemon_padding(size_t nbytes)
+static MPI_Offset lemon_padding(MPI_Offset nbytes)
 {
   return (8 - (nbytes % 8)) % 8;
 }

@@ -7,8 +7,7 @@
 #include "internal_setupIOTypes.static"
 #include "internal_freeIOTypes.static"
 
-int lemonWriteLatticeParallelMapped(LemonWriter *writer, void *data,
-                                    MPI_Offset siteSize, int *latticeDims, int const *mapping)
+int lemonWriteLatticeParallelMapped(LemonWriter *writer, void *data, MPI_Offset siteSize, int const *latticeDims, int const *mapping)
 {
   int        written;
   int        error;

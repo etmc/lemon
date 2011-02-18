@@ -2,7 +2,7 @@
 #include <lemon.h>
 #include <memory.h>
 
-int lemonReaderSetState(LemonReader *rdest, LemonReader *rsrc)
+int lemonReaderSetState(LemonReader *rdest, LemonReader const *rsrc)
 {
   MPI_Offset   disp;
   MPI_Datatype etype;

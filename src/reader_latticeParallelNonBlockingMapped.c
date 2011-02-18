@@ -7,12 +7,9 @@
 #include "internal_setupIOTypes.static"
 #include "internal_freeIOTypes.static"
 
-int lemonReadLatticeParallelNonBlockingMapped(LemonReader *reader, void *data, MPI_Offset siteSize,
-                                              int *latticeDims, int const *mapping)
+int lemonReadLatticeParallelNonBlockingMapped(LemonReader *reader, void *data, MPI_Offset siteSize, int const *latticeDims, int const *mapping)
 {
-  int        read;
   int        error;
-  MPI_Status status;
   LemonSetup setup;
 
   error = lemonClearReaderState(reader);

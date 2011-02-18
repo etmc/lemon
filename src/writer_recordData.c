@@ -2,13 +2,13 @@
 #include <lemon.h>
 #include <stdio.h>
 
-int lemonWriteRecordData(void *source, uint64_t *nbytes, LemonWriter* writer)
+int lemonWriteRecordData(void *source, MPI_Offset *nbytes, LemonWriter* writer)
 {
   MPI_Status status;
   int        bytesRead;
   int        err;
 
-  if (source == NULL || nbytes == (uint64_t*)NULL || *nbytes == 0 || writer == (LemonWriter*)NULL)
+  if (source == NULL || nbytes == (MPI_Offset*)NULL || *nbytes == 0 || writer == (LemonWriter*)NULL)
   {
     fprintf(stderr, "[LEMON] Node %d reports in lemonWriteRecordData:\n"
                     "        NULL pointer or uninitialized writer provided.\n", writer->my_rank);
@@ -27,7 +27,7 @@ int lemonWriteRecordData(void *source, uint64_t *nbytes, LemonWriter* writer)
 
   MPI_File_sync(*writer->fp);
   MPI_Bcast(&err, 1, MPI_INT, 0, writer->cartesian);
-  MPI_Bcast(nbytes, sizeof(uint64_t), MPI_BYTE, 0, writer->cartesian);
+  MPI_Bcast(nbytes, sizeof(MPI_Offset), MPI_BYTE, 0, writer->cartesian);
   MPI_Barrier(writer->cartesian);
   writer->pos += *nbytes;
 

@@ -4,7 +4,7 @@
 
 #include "internal_padding.static"
 
-size_t lemonReaderPadBytes(LemonReader *reader)
+MPI_Offset lemonReaderPadBytes(LemonReader *reader)
 {
   if ((reader == (LemonReader*)NULL) || reader->is_awaiting_header)
   {

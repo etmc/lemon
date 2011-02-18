@@ -2,7 +2,7 @@
 #include <lemon.h>
 #include <stdio.h>
 
-char *lemonReaderType(LemonReader *reader)
+char const *lemonReaderType(LemonReader *reader)
 {
   if ((reader == (LemonReader*)NULL) || reader->is_awaiting_header)
   {

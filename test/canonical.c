@@ -11,7 +11,7 @@ int main(int argc, char **argv)
   LemonWriter *w;
   LemonRecordHeader *h;
   char message[] = "LEMON test message";
-  uint64_t bytes = strlen(message);
+  MPI_Offset bytes = strlen(message);
 
   MPI_Init(&argc, &argv);
   MPI_Info_create(&info);

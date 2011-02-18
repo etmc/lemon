@@ -14,7 +14,7 @@ int main(int argc, char **argv)
   char *data_read;
   int mpisize;
   int rank;
-  char *type;
+  char const *type;
 
   int ME_flag=1, MB_flag=1, status=0;
 

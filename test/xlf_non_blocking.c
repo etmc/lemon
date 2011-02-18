@@ -18,9 +18,9 @@ int main(int argc, char **argv)
   int err;
   char message[512];
   char message_read[512];
-  char *type;
-  uint64_t bytes;
-  uint64_t bytes_read;
+  char const *type;
+  MPI_Offset bytes;
+  MPI_Offset bytes_read;
   struct timeval t1;
 
   MPI_Init(&argc, &argv);
@@ -40,7 +40,7 @@ int main(int argc, char **argv)
   status = lemonWriteRecordHeader(h, w);
 
   lemonDestroyHeader( h );
-  lemonWriteRecordDataNonBlocking(message, bytes, w);
+  lemonWriteRecordDataNonBlocking(message, &bytes, w);
   lemonFinishWriting(w);
   lemonWriterCloseRecord(w);
   lemonDestroyWriter(w);
@@ -59,7 +59,7 @@ int main(int argc, char **argv)
     fprintf(stderr, "Node %d reports: wrong type read.\n", rank);
 
   bytes_read = bytes;
-  lemonReaderReadDataNonBlocking(message_read, bytes_read, r);
+  lemonReaderReadDataNonBlocking(message_read, &bytes_read, r);
   err = lemonFinishReading(r);
 
   if (err)

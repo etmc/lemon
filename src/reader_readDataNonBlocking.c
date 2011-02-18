@@ -2,7 +2,7 @@
 #include <lemon.h>
 #include <stdio.h>
 
-int lemonReaderReadDataNonBlocking(void *dest, uint64_t nbytes, LemonReader *reader)
+int lemonReaderReadDataNonBlocking(void *dest, MPI_Offset const *nbytes, LemonReader *reader)
 {
   int err;
 
@@ -13,7 +13,7 @@ int lemonReaderReadDataNonBlocking(void *dest, uint64_t nbytes, LemonReader *rea
     return LEMON_ERR_PARAM;
   }
 
-  err = MPI_File_read_at_all_begin(*reader->fp, reader->off + reader->pos, dest, nbytes, MPI_BYTE);
+  err = MPI_File_read_at_all_begin(*reader->fp, reader->off + reader->pos, dest, *nbytes, MPI_BYTE);
 
   if (err != MPI_SUCCESS)
   {
@@ -24,7 +24,7 @@ int lemonReaderReadDataNonBlocking(void *dest, uint64_t nbytes, LemonReader *rea
   reader->is_busy = 1;
   reader->is_striped = 0;
   reader->buffer = dest;
-  reader->bytes_wanted = nbytes;
+  reader->bytes_wanted = *nbytes;
 
   return LEMON_SUCCESS;
 }

@@ -65,21 +65,21 @@ MPI_Offset lemonGetReaderPointer(LemonReader *reader);
 int lemonReaderNextRecord(LemonReader *reader);
 int lemonReaderMBFlag(LemonReader *reader);
 int lemonReaderMEFlag(LemonReader *reader);
-char *lemonReaderType(LemonReader *reader);
-uint64_t lemonReaderBytes(LemonReader *reader);
-size_t lemonReaderPadBytes(LemonReader *reader);
+char const *lemonReaderType(LemonReader *reader);
+MPI_Offset lemonReaderBytes(LemonReader *reader);
+MPI_Offset lemonReaderPadBytes(LemonReader *reader);
 
-int lemonReaderReadData(void *dest, uint64_t *nbytes, LemonReader *reader);
+int lemonReaderReadData(void *dest, MPI_Offset *nbytes, LemonReader *reader);
 int lemonReaderCloseRecord(LemonReader *reader);
 int lemonReaderSeek(LemonReader *reader, MPI_Offset offset, int whence);
-int lemonReaderSetState(LemonReader *rdest, LemonReader *rsrc);
+int lemonReaderSetState(LemonReader *rdest, LemonReader const *rsrc);
 int lemonEOM(LemonReader *reader);
 
 /* Additions for LEMON follow */
-int lemonReadLatticeParallel(LemonReader *reader, void *data, MPI_Offset siteSize, int *latticeDims);
-int lemonReadLatticeParallelMapped(LemonReader *reader, void *data, MPI_Offset siteSize, int *latticeDims, int const *mapping);
-int lemonReadLatticeParallelNonBlocking(LemonReader *reader, void *data, MPI_Offset siteSize, int *latticeDims);
-int lemonReadLatticeParallelNonBlockingMapped(LemonReader *reader, void *data, MPI_Offset siteSize, int *latticeDims, int const *mapping);
-int lemonReaderReadDataNonBlocking(void *dest, uint64_t nbytes, LemonReader *reader);
+int lemonReadLatticeParallel(LemonReader *reader, void *data, MPI_Offset siteSize, int const *latticeDims);
+int lemonReadLatticeParallelMapped(LemonReader *reader, void *data, MPI_Offset siteSize, int const *latticeDims, int const *mapping);
+int lemonReadLatticeParallelNonBlocking(LemonReader *reader, void *data, MPI_Offset siteSize, int const *latticeDims);
+int lemonReadLatticeParallelNonBlockingMapped(LemonReader *reader, void *data, MPI_Offset siteSize, int const *latticeDims, int const *mapping);
+int lemonReaderReadDataNonBlocking(void *dest, MPI_Offset const *nbytes, LemonReader *reader);
 int lemonFinishReading(LemonReader *reader);
 

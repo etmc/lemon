@@ -28,9 +28,9 @@ int main(int argc, char *argv[])
   MPI_File fp;
   MPI_Info info;
   int status;
-  uint64_t nbytes, read_bytes;
+  MPI_Offset nbytes, read_bytes;
   int msg,rec,first;
-  char *lemon_type;
+  char const *lemon_type;
   size_t bytes_pad;
   int MB_flag, ME_flag;
 

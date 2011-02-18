@@ -9,7 +9,7 @@
 #include "internal_bigEndianLong.static"
 #include "internal_bigEndianLongLong.static"
 
-static int writeLemonRecordBinaryHeader(LemonWriter *writer, LemonRecordHeader *header)
+static int writeLemonRecordBinaryHeader(LemonRecordHeader const *header, LemonWriter *writer)
 {
   int i;
   int result;

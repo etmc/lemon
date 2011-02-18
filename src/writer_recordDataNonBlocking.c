@@ -2,7 +2,7 @@
 #include <lemon.h>
 #include <stdio.h>
 
-int lemonWriteRecordDataNonBlocking(void *source, uint64_t nbytes, LemonWriter* writer)
+int lemonWriteRecordDataNonBlocking(void *source, MPI_Offset const *nbytes, LemonWriter* writer)
 {
   int err;
 
@@ -17,12 +17,12 @@ int lemonWriteRecordDataNonBlocking(void *source, uint64_t nbytes, LemonWriter* 
     lemonFinishWriting(writer);
 
   if (writer->my_rank == 0)
-    err = MPI_File_iwrite_at(*writer->fp, writer->off + writer->pos, source, nbytes, MPI_BYTE, &writer->request);
+    err = MPI_File_iwrite_at(*writer->fp, writer->off + writer->pos, source, *nbytes, MPI_BYTE, &writer->request);
 
   writer->is_busy = 1;
   writer->is_collective = 0;
   writer->buffer = source;
-  writer->bytes_wanted = (int)nbytes;
+  writer->bytes_wanted = *nbytes;
 
   MPI_File_sync(*writer->fp);
   MPI_Bcast(&err, 1, MPI_INT, 0, writer->cartesian);

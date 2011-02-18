@@ -38,5 +38,5 @@ typedef struct
 } LemonRecordHeader;
 
 /* Header manipulators */
-LemonRecordHeader *lemonCreateHeader(int MB_flag, int ME_flag, char *type, uint64_t reclen);
+LemonRecordHeader *lemonCreateHeader(int MB_flag, int ME_flag, char const *type, uint64_t reclen);
 void lemonDestroyHeader(LemonRecordHeader *h);

@@ -2,8 +2,6 @@
 #include <lemon.h>
 #include <stdio.h>
 
-#include "internal_padding.static"
-
 int lemonFinishWriting(LemonWriter *writer)
 {
   int written;

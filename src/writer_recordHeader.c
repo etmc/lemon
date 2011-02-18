@@ -2,7 +2,7 @@
 #include <lemon.h>
 #include "internal_writeRecordBinaryHeader.static"
 
-int lemonWriteRecordHeader(LemonRecordHeader *props, LemonWriter* writer)
+int lemonWriteRecordHeader(LemonRecordHeader const *props, LemonWriter* writer)
 {
   int result;
 
@@ -36,7 +36,7 @@ int lemonWriteRecordHeader(LemonRecordHeader *props, LemonWriter* writer)
     return LEMON_ERR_MBME;
   }
 
-  result = writeLemonRecordBinaryHeader(writer, props);
+  result = writeLemonRecordBinaryHeader(props, writer);
 
   /* Set new writer state */
   writer->is_awaiting_header = 0;

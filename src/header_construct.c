@@ -2,7 +2,7 @@
 #include <lemon.h>
 #include <string.h>
 
-LemonRecordHeader *lemonCreateHeader(int MB_flag, int ME_flag, char *type, uint64_t reclen)
+LemonRecordHeader *lemonCreateHeader(int MB_flag, int ME_flag, char const *type, uint64_t reclen)
 {
   LemonRecordHeader *result;
   size_t type_length;
