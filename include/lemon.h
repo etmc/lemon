@@ -26,6 +26,10 @@
  * please contact A. Deuzeman (a.deuzeman@rug.nl)                           *
  ****************************************************************************/
 
+#include <mpi.h>
+#include <stdint.h>
+#include <stdlib.h>
+
 #include "lemon_defines.h"
 #include "lemon_header.h"
 #include "lemon_reader.h"
