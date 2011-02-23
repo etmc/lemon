@@ -11,5 +11,5 @@ MPI_Offset lemonGetReaderPointer(LemonReader *reader)
     return LEMON_ERR_PARAM;
   }
 
-  return (reader->off + reader->pos);
+  return reader->pos;
 }

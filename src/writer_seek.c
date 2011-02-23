@@ -23,9 +23,20 @@ int lemonWriterSeek(LemonWriter *writer, MPI_Offset offset, int whence)
   else if (whence == MPI_SEEK_END)
     writer->pos = writer->data_length - offset;
   else
+  {
+    fprintf(stderr, "[LEMON] Node %d reports in lemonWriterSeek:\n"
+                    "        Value passed for whence not recognized.\n", writer->my_rank);
     return LEMON_ERR_PARAM;
+  }
 
-  err = MPI_File_seek(*writer->fp, writer->pos, MPI_SEEK_SET);
+  if ((reader->pos >= writer->data_length) || (writer->pos < 0))
+  {
+    fprintf(stderr, "[LEMON] Node %d reports in lemonWriterSeek:\n"
+                    "        Value passed for offset brings file pointer outside of current record.\n", writer->my_rank);
+    return LEMON_ERR_SEEK;
+  }
+
+  err = MPI_File_seek(*writer->fp, writer->off + writer->pos, MPI_SEEK_SET);
   MPI_Barrier(writer->cartesian);
 
   if (err != MPI_SUCCESS)

@@ -28,7 +28,14 @@ int lemonReaderSeek(LemonReader *reader, MPI_Offset offset, int whence)
     return LEMON_ERR_PARAM;
   }
 
-  err = MPI_File_seek(*reader->fp, reader->pos, MPI_SEEK_SET);
+  if ((reader->pos >= reader->curr_header->data_length) || (reader->pos < 0))
+  {
+    fprintf(stderr, "[LEMON] Node %d reports in lemonReaderSeek:\n"
+                    "        Value passed for offset brings file pointer outside of current record.\n", reader->my_rank);
+    return LEMON_ERR_SEEK;
+  }
+
+  err = MPI_File_seek(*reader->fp, reader->off + reader->pos, MPI_SEEK_SET);
 
   if (err != MPI_SUCCESS)
   {
