@@ -29,7 +29,7 @@ int lemonWriterSeek(LemonWriter *writer, MPI_Offset offset, int whence)
     return LEMON_ERR_PARAM;
   }
 
-  if ((reader->pos >= writer->data_length) || (writer->pos < 0))
+  if ((writer->pos >= writer->data_length) || (writer->pos < 0))
   {
     fprintf(stderr, "[LEMON] Node %d reports in lemonWriterSeek:\n"
                     "        Value passed for offset brings file pointer outside of current record.\n", writer->my_rank);
