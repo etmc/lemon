@@ -1,5 +1,3 @@
-#pragma once
-
 /*****************************************************************************
  * LEMON v1.00                                                               *
  *                                                                           *
@@ -25,6 +23,8 @@
  * For support requests or bug reports, please contact                       *
  *    A. Deuzeman (deuzeman@itp.unibe.ch)                                    *
  *****************************************************************************/
+
+#pragma once
 
 #include <mpi.h>
 #include <stdint.h>

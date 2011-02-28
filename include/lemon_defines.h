@@ -1,5 +1,3 @@
-#pragma once
-
 /*****************************************************************************
  * LEMON v1.00                                                               *
  *                                                                           *
@@ -25,6 +23,8 @@
  * For support requests or bug reports, please contact                       *
  *    A. Deuzeman (deuzeman@itp.unibe.ch)                                    *
  *****************************************************************************/
+
+#pragma once
 
 #define LEMON_MAGIC_NO                   0x456789ab
 #define LEMON_VERSION                             1
