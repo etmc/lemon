@@ -1,41 +1,11 @@
 #include <lemon.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 
 #include "md5.h"
 
-static char out[32];
-char *humanForm(unsigned long long int filesize)
-{
-  static char const *units[] = {"kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"};
-  double engFilesize;
-  int  prec;
-
-  /* Using SI conventions, unambiguous since these are transmission speeds */
-  if (filesize < 1000)
-  {
-    sprintf(out, "%u B", (unsigned int)filesize);
-    return out;
-  }
-
-  size_t ucnt = 0;
-  while ((ucnt < 7) && (filesize / 1000) > 1000 )
-  {
-    filesize /= 1000;
-    ++ucnt;
-  }
-  engFilesize = filesize / 1000.0;
-
-  filesize /= 1000;
-  if (filesize >= 100)
-    sprintf(out, "%5.0f %s", engFilesize, units[ucnt]);
-  else if (filesize >= 10)
-    sprintf(out, "%5.1f %s", engFilesize, units[ucnt]);
-  else 
-   sprintf(out, "%5.2f %s", engFilesize, units[ucnt]);
-
-  return out;
-}
+char const *humanForm(unsigned long long int filesize);
 
 int main(int argc, char **argv)
 {
@@ -152,7 +122,7 @@ int main(int argc, char **argv)
   md5_append(&state, (md5_byte_t const *)data, 72 * localVol * sizeof(double));
   md5_finish(&state, after);
 
-  hashMatch = strncmp(before, after, 16);
+  hashMatch = strncmp((char const *)before, (char const *)after, 16);
   MPI_Reduce(&hashMatch, &hashMatchAll, 1, MPI_INT, MPI_SUM, 0, cartesian);
 
   if (rank == 0)
