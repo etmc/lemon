@@ -33,5 +33,5 @@ AC_CHECK_FUNCS([gettimeofday])
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([include/Makefile])
 AC_CONFIG_FILES([src/Makefile])
-AC_CONFIG_FILES([test/Makefile])
+AC_CONFIG_FILES([check/Makefile])
 AC_OUTPUT
