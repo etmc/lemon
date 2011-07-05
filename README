@@ -1,16 +1,70 @@
-A longer description of this library, including a detailed overview of all the functions that are part of its API, has been published as 
-A. Deuzeman, S.F. Reker and C. Urbach, for the ETM Collaboration, "Lemon: an MPI parallel I/O library for data encapsulation using LIME"
+A longer description of this library, including a detailed overview of all the 
+functions that are part of its API, has been published as 
+A. Deuzeman, S.F. Reker and C. Urbach, for the ETM Collaboration,
+"Lemon: an MPI parallel I/O library for data encapsulation using LIME"
 and is currently available from http://arxiv.org/abs/1106.4177
 
-This README is intended to help new users get Lemon up and running quickly. Upon downloading and extracting the Lemon tarball, one should have a obtained a directory containing, amongst this README file, a configure script and several subdirectories. These subdirectories include all the headers associated with the library (in the directory include), the source code itself (in the directory src) and some binaries that do not themselves form part of Lemon (in the directory check).
+This README is intended to help new users get Lemon up and running quickly. Upon
+downloading and extracting the Lemon tarball, one should have a obtained a 
+directory containing, amongst this README file, a configure script and several 
+subdirectories. These subdirectories include all the headers associated with the
+library (in the directory include), the source code itself (in the directory
+src) and some binaries that do not themselves form part of Lemon (in the
+directory check).
 
-The GNU build system is used for Lemon and the usual configure script is provided. Configuring Lemon should be straightforward, as only the common arguments are taken into consideration. Of relevance is mainly the --prefix argument, that will set the install directory. It is crucial, however, to either use an MPI wrapper around the compiler, or set the include and linker paths such that MPI can be found. This can be done by setting environment variables, e.g. CC=mpicc
+The GNU build system is used for Lemon and the usual configure script is
+provided. Configuring Lemon should be straightforward, as only the common
+arguments are taken into consideration. Of relevance is mainly the --prefix
+argument, that will set the install directory. It is crucial, however, to either
+use an MPI wrapper around the compiler, or set the include and linker paths
+such that MPI can be found. This can be done by setting environment variables,
+e.g. CC=mpicc
 
-Once the library has been configured, make will compile both the library itself and two binaries that can be found in the test subdirectory (The system will call aclocal-1.9, automake-1.9 and autoconf. This will result in an error if only newer versions are available, but one can simply invoke aclocal, automake and autoconf manually and call make again to continue). These two binaries not only provide short, self-contained samples of Lemon usage, but are in fact potentially useful in a production environment. The first, lemon_contents, is a direct port of the C-LIME lime_contents program. It displays a short overview of all the records available within a particular LIME file. If the contents of a record data block are both non-binary and short enough, lemon_contents will send it to standard output. Potential uses for lemon_contents include checking if a LIME file is well-formed and displaying the metadata associated with a particular file. The second program that is compiled by default is lemon_benchmark. This executable will generate an artificial lattice of random data, the topology of which will be generated automatically using the number of MPI processes as an input. Its local volume is fixed, so its global volume will scale with the number of processes. This lattice is written out and subsequently read in, both using Lemon's parallel I/O routines. The I/O speed is calculated from the timing of both operations and reported on standard output. To check for the correct operation of the library, an MD5 hash is calculated (The MD5 implementation included here was written by L. Peter Deutsch and is available freely from http://sourceforge.net/projects/libmd5-rfc/files/) for the data before and after the I/O operations and any discrepancies will be reported. This code is intended to allow the user to obtain basic information on the I/O performance on his or her particular system and to give some indication of the scaling. Of course, it also functions as a basic tool for detecting major problems in the writing or retrieving of data. After running make, the user can run make install to install the library, its headers and the two binaries described above to the directory specified by the --prefix argument to configure (or the default location if that argument has been omitted). 
+Once the library has been configured, make will compile both the library itself
+and two binaries that can be found in the test subdirectory (The system will
+call aclocal-1.9, automake-1.9 and autoconf. This will result in an error if
+only newer versions are available, but one can simply invoke aclocal, automake
+and autoconf manually and call make again to continue). These two binaries not
+only provide short, self-contained samples of Lemon usage, but are in fact
+potentially useful in a production environment. The first, lemon_contents, is a
+direct port of the C-LIME lime_contents program. It displays a short overview of
+all the records available within a particular LIME file. If the contents of a
+record data block are both non-binary and short enough, lemon_contents will send
+it to standard output. Potential uses for lemon_contents include checking if a
+LIME file is well-formed and displaying the metadata associated with a
+particular file. The second program that is compiled by default is
+lemon_benchmark. This executable will generate an artificial lattice of random
+data, the topology of which will be generated automatically using the number of
+MPI processes as an input. Its local volume is fixed, so its global volume will
+scale with the number of processes. This lattice is written out and subsequently
+read in, both using Lemon's parallel I/O routines. The I/O speed is calculated
+from the timing of both operations and reported on standard output. To check for
+the correct operation of the library, an MD5 hash is calculated (The MD5
+implementation included here was written by L. Peter Deutsch and is available
+freely from http://sourceforge.net/projects/libmd5-rfc/files/) for the data
+before and after the I/O operations and any discrepancies will be reported. This
+code is intended to allow the user to obtain basic information on the I/O
+performance on his or her particular system and to give some indication of the
+scaling. Of course, it also functions as a basic tool for detecting major
+problems in the writing or retrieving of data. After running make, the user can
+run make install to install the library, its headers and the two binaries
+described above to the directory specified by the --prefix argument to
+configure (or the default location if that argument has been omitted). 
 
-Additional binaries can still be compiled by calling make check. These will include the writing and reading of an artifical metadata record, both using blocking and non-blocking I/O (xlf and xlf_non_blocking}), that can be displayed using lemon_contents. Also provided are two programs that write a small amount of data using the mapped parallel I/O routines, again in a blocking and non-blocking version (parallel and parallel_non_blocking). The data written will be a set of characters identifying a particular MPI process, such that the output file demonstrates the linearisation of the data. The last sample program that has been included is canonical, a skeleton implementation of the library. None of these binaries will be installed, as they serve no particular function other than being examples.
+Additional binaries can still be compiled by calling make check. These will
+include the writing and reading of an artifical metadata record, both using
+blocking and non-blocking I/O (xlf and xlf_non_blocking}), that can be displayed
+using lemon_contents. Also provided are two programs that write a small amount
+of data using the mapped parallel I/O routines, again in a blocking and
+non-blocking version (parallel and parallel_non_blocking). The data written will
+be a set of characters identifying a particular MPI process, such that the
+output file demonstrates the linearisation of the data. The last sample program
+that has been included is canonical, a skeleton implementation of the library.
+None of these binaries will be installed, as they serve no particular function
+other than being examples.
 
-As an example, an MPI run of lemon_benchmark with 4 MPI processes should provide the following result (your reading and writing speeds and times may vary):
+As an example, an MPI run of lemon_benchmark with 4 MPI processes should provide
+the following result (your reading and writing speeds and times may vary):
 
 mpirun -np 4 ./lemon_benchmark
 Benchmark on a block of data  9.44 MB in size,
