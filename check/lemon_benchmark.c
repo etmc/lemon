@@ -56,12 +56,13 @@ int main(int argc, char **argv)
 
   int latDist[] = {0, 0, 0, 0};
   int periods[] = {1, 1, 1, 1};
+  int locSizes[4];
   int latSizes[4];
   int localVol = 1;
   int latVol = localVol;
 
   MPI_Comm cartesian;
-  int i;
+  int i, j;
 
   md5_state_t state;
   md5_byte_t before[16];
@@ -121,8 +122,9 @@ int main(int argc, char **argv)
   for (i = 0; i < 4; ++i)
   {
     int div = (i == 3 ? (2 * L) : L) / latDist[i];
-    latSizes[i] = div ? div : 1;
-    localVol *= div;
+    locSizes[i] = div ? div : 1;
+    localVol *= locSizes[i];
+    latSizes[i] = locSizes[i] * latDist[i];
   }
   latVol = mpisize * localVol;
   ldsize = localVol * 72 * sizeof(double);
@@ -134,13 +136,13 @@ int main(int argc, char **argv)
   if (rank == 0)
   {
     fprintf(stdout, "Benchmark on a block of data %s in size,\n", humanForm(fsize));
-    fprintf(stdout, "representing a %u x %u x %u x %u lattice", latSizes[0] * latDist[0], latSizes[1] * latDist[1], latSizes[2] * latDist[2], latSizes[3] * latDist[3]);
+    fprintf(stdout, "representing a %u x %u x %u x %u lattice", latSizes[0], latSizes[1], latSizes[2], latSizes[3]);
     if (mpisize == 1)
       fprintf(stdout, ".\n\n");
     else
     {
       fprintf(stdout, ",\ndistributed over %u MPI processes\n", mpisize);
-      fprintf(stdout, "for a local %u x %u x %u x %u lattice.\n\n", latSizes[0], latSizes[1], latSizes[2], latSizes[3]);
+      fprintf(stdout, "for a local %u x %u x %u x %u lattice.\n\n", locSizes[0], locSizes[1], locSizes[2], locSizes[3]);
     }
   }
 
@@ -151,16 +153,17 @@ int main(int argc, char **argv)
     fprintf(stderr, "ERROR: Could not allocate memory.\n");
     return 1;
   }
+  srand(time(NULL) + rank);
 
-  /* Start of writing test */
+  /* Start of test */
   for (i = 0; i < iters; ++i)
   {
-    fprintf(stdout, "Measurement %d of %d.\n", i + 1, iters);
+    if (rank == 0)
+      fprintf(stdout, "Measurement %d of %d.\n", i + 1, iters);
     /* Create a block of dummy data to write out 
        Fill with some random numbers to make sure we don't get coincidental matches here */
-    srand(time(NULL) + rank); /* Make sure all blocks are different */
-    for (i = 0; i < (localVol *  72); ++i)
-      data[i] = rscale * (double)rand();
+     for (j = 0; j < (localVol * 72); ++j)
+	   data[j] = rscale * (double)rand();
 
     /* Calculate a hash of the data, to check integrity against */
     md5_init(&state);
@@ -184,14 +187,14 @@ int main(int argc, char **argv)
     MPI_Barrier(cartesian);
     timesWrite[i] = tock - tick;
     if (rank == 0)
-      fprintf(stdout, "Time spent writing was %4.2g s. ", timesWrite[i]);
+      fprintf(stdout, "Time spent writing was %4.2g s.\n", timesWrite[i]);
 
     lemonWriterCloseRecord(w);
     lemonDestroyWriter(w);
     MPI_File_close(&fp);
 
     /* Clear data to avoid an utterly failed read giving md5 hash matches from the old data */
-    memset(data, 0, ldsize);
+     memset(data, 0, ldsize);
 
     /* Start of reading test */
     MPI_File_open(cartesian, "benchmark.test", MPI_MODE_RDONLY | MPI_MODE_DELETE_ON_CLOSE, MPI_INFO_NULL, &fp);
@@ -211,7 +214,7 @@ int main(int argc, char **argv)
     timesRead[i] = tock - tick;
     MPI_Barrier(cartesian);
     if (rank == 0)
-      fprintf(stdout, "Time spent reading was %4.2g s. ", timesRead[i]);
+      fprintf(stdout, "Time spent reading was %4.2g s.\n", timesRead[i]);
 
     lemonDestroyReader(r);
     MPI_File_close(&fp);
@@ -220,12 +223,15 @@ int main(int argc, char **argv)
     md5_append(&state, (md5_byte_t const *)data, ldsize);
     md5_finish(&state, after);
 
-    hashMatch[i] = strncmp((char const *)before, (char const *)after, 16);
+    hashMatch[i] = strncmp((char const *)before, (char const *)after, 16) != 0 ? 1 : 0;
     MPI_Reduce(hashMatch + i, hashMatchAll + i, 1, MPI_INT, MPI_SUM, 0, cartesian);
-    if (hashMatchAll[i] == 0)
-      fprintf(stdout, "All nodes report that MD5 hash matches.\n");
-    else
-      fprintf(stdout, "WARNING: MD5 hash failure detected!\n");
+    if (rank == 0)
+    {
+      if (hashMatchAll[i] == 0)
+        fprintf(stdout, "All nodes report that MD5 hash matches.\n\n");
+      else
+        fprintf(stdout, "WARNING: MD5 hash failure detected!\n\n");
+    }
   }
 
   /* Aggregate the data */
@@ -240,29 +246,27 @@ int main(int argc, char **argv)
     timesRead[0] += timesRead[i];
     stdRead += timesRead[i] * timesRead[i];
   }
+  stdWrite /= iters;
+  stdRead /= iters;
+  timesWrite[0] /= iters;
+  timesRead[0] /= iters;
+
   stdWrite -= timesWrite[0] * timesWrite[0];
   stdRead -= timesRead[0] * timesRead[0];
   
-  timesWrite[0] /= iters;
-  timesRead[0] /= iters;
-  stdWrite /= iters;
-  stdRead /= iters;
-  
   if (rank == 0)
   {
-    fprintf(stdout, "Average time spent writing was %4.2g s, ", timesWrite[0]);
-    fprintf(stdout, "with a standard deviation of %4.2g s.\n", stdWrite);
-    fprintf(stdout, "Average time spent reading was %4.2g s, ", timesRead[0]);
-    fprintf(stdout, "with a standard deviation of %4.2g s.\n\n", stdRead);
+    fprintf(stdout, "Average time spent writing was %4.2e s, ", timesWrite[0]);
+    fprintf(stdout, "with a standard deviation of %4.2e s.\n", sqrt(stdWrite));
+    fprintf(stdout, "Average time spent reading was %4.2e s, ", timesRead[0]);
+    fprintf(stdout, "with a standard deviation of %4.2e s.\n\n", sqrt(stdRead));
     
     stdWrite *= (double)fsize / (timesWrite[0] * timesWrite[0]);
     stdRead *= (double)fsize / (timesRead[0] * timesRead[0]);
-    fprintf(stdout, "Average writing speed was %s/s, ", humanForm((unsigned long long int)(fsize / timesWrite[0])));
-    fprintf(stdout, "with a standard deviation of %s/s.\n", humanForm((unsigned long long)stdWrite));
-    fprintf(stdout, "Average reading speed was %s/s, ", humanForm((unsigned long long int)(fsize / timesRead[0])));
-    fprintf(stdout, "with a standard deviation of %s/s.\n\n", humanForm((unsigned long long)stdRead));
+    fprintf(stdout, "Average writing speed was %s/s\n", humanForm((unsigned long long int)(fsize / timesWrite[0])));
+    fprintf(stdout, "Average reading speed was %s/s\n", humanForm((unsigned long long int)(fsize / timesRead[0])));
 
-    if (hashMatch[0] == 0)
+    if (hashMatchAll[0] == 0)
       fprintf(stdout, "All data hashed correctly.\n");
     else
       fprintf(stdout, "WARNING: %d hash mismatches detected!.\n", hashMatchAll[0]);
