@@ -34,22 +34,23 @@ it to standard output. Potential uses for lemon_contents include checking if a
 LIME file is well-formed and displaying the metadata associated with a
 particular file. The second program that is compiled by default is
 lemon_benchmark. This executable will generate an artificial lattice of random
-data, the topology of which will be generated automatically using the number of
-MPI processes as an input. Its local volume is fixed, so its global volume will
-scale with the number of processes. This lattice is written out and subsequently
+data, the topology of which will be generated automatically taking into account
+the number of MPI processes. This lattice is written out and subsequently
 read in, both using Lemon's parallel I/O routines. The I/O speed is calculated
-from the timing of both operations and reported on standard output. To check for
-the correct operation of the library, an MD5 hash is calculated (The MD5
-implementation included here was written by L. Peter Deutsch and is available
-freely from http://sourceforge.net/projects/libmd5-rfc/files/) for the data
-before and after the I/O operations and any discrepancies will be reported. This
-code is intended to allow the user to obtain basic information on the I/O
-performance on his or her particular system and to give some indication of the
-scaling. Of course, it also functions as a basic tool for detecting major
-problems in the writing or retrieving of data. After running make, the user can
-run make install to install the library, its headers and the two binaries
-described above to the directory specified by the --prefix argument to
-configure (or the default location if that argument has been omitted). 
+from the timing of both operations and reported on standard output. Two arguments 
+should be provided. The first is the length L of the spatial dimensions of the 
+lattice, which determines the global size of the lattice as L^3 x 2 L. The second
+is the number of iterations of the write-read cycle. To check the correct operation 
+of the library, an MD5  hash is calculated for the data before and after the I/O 
+operations and any discrepancies will be reported. The MD5 implementation included 
+here was written by L. Peter Deutsch and is available freely from 
+http://sourceforge.net/projects/libmd5-rfc/files/. This code is intended to allow 
+the user to obtain basic information on the I/O performance on his or her particular
+system and to give some indication of the scaling. Of course, it also functions as
+a basic tool for detecting major problems in the writing or retrieving of data. 
+After running make, the user can run make install to install the library, its headers 
+and the two binaries described above to the directory specified by the --prefix argument 
+to configure (or the default location if that argument has been omitted). 
 
 Additional binaries can still be compiled by calling make check. These will
 include the writing and reading of an artifical metadata record, both using
