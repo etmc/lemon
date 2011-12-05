@@ -64,28 +64,34 @@ that has been included is canonical, a skeleton implementation of the library.
 None of these binaries will be installed, as they serve no particular function
 other than being examples.
 
-As an example, an MPI run of lemon_benchmark with 4 MPI processes should provide
-the following result (your reading and writing speeds and times may vary):
+As an example, an MPI run of lemon_benchmark on 4 MPI processes, performing 3
+measurements of the IO timings for an 8 x 8 x 8 x 16 lattice should provide the
+following result (your reading and writing speeds and times may vary):
 
-mpirun -np 4 ./lemon_benchmark 2 2
-Benchmark on a block of data  18.4 kB in size,
-representing a 2 x 2 x 2 x 4 lattice,
+mpirun -np 4 lemon_benchmark 8 3
+Benchmark on a block of data  4.72 MB in size,
+representing a 8 x 8 x 8 x 16 lattice,
 distributed over 4 MPI processes
-for a local 1 x 1 x 2 x 4 lattice.
+for a local 4 x 4 x 8 x 16 lattice.
 
-Measurement 1 of 2.
-Time spent writing was 0.07 s.
-Time spent reading was 0.0001 s.
+Measurement 1 of 3.
+Time spent writing was 0.15 s.
+Time spent reading was 0.016 s.
 All nodes report that MD5 hash matches.
 
-Measurement 2 of 2.
-Time spent writing was 0.12 s.
-Time spent reading was 7.7e-05 s.
+Measurement 2 of 3.
+Time spent writing was  0.2 s.
+Time spent reading was 0.017 s.
 All nodes report that MD5 hash matches.
 
-Average time spent writing was 9.32e-02 s, with a standard deviation of 2.28e-02 s.
-Average time spent reading was 9.00e-05 s, with a standard deviation of 1.30e-05 s.
+Measurement 3 of 3.
+Time spent writing was 0.21 s.
+Time spent reading was 0.018 s.
+All nodes report that MD5 hash matches.
 
-Average writing speed was   198 kB/s
-Average reading speed was   205 MB/s
+Average time spent writing was 1.88e-01 s, with a standard deviation of 2.50e-02 s.
+Average time spent reading was 1.68e-02 s, with a standard deviation of 1.05e-03 s.
+
+Average writing speed was  25.1 MB/s
+Average reading speed was   281 MB/s
 All data hashed correctly.
