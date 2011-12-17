@@ -31,14 +31,18 @@
 #include "internal_LemonSetup.ih"
 #include "internal_clearWriterState.static"
 #include "internal_setupIOTypes.static"
+#include "internal_splitSize.static"
 #include "internal_freeIOTypes.static"
 
 int lemonWriteLatticeParallelMapped(LemonWriter *writer, void *data, MPI_Offset siteSize, int const *latticeDims, int const *mapping)
 {
-  int        written;
-  int        error;
-  MPI_Status status;
-  LemonSetup setup;
+  int          written;
+  int          error;
+  int          factor;
+  size_t       volfac;
+  MPI_Status   status;
+  MPI_Datatype factype;
+  LemonSetup   setup;
 
   error = lemonClearWriterState(writer);
   if (error != LEMON_SUCCESS)
@@ -65,8 +69,21 @@ int lemonWriteLatticeParallelMapped(LemonWriter *writer, void *data, MPI_Offset 
   /* Free up the resources we claimed for this operation. */
   lemonFreeIOTypes(&setup);
 
-  MPI_Get_count(&status, MPI_BYTE, &written);
-  if (written != siteSize * setup.localVol)
+  /* Workaround to avoid integer overflows for filesizes > 2G, 
+   * should be fixed in the 3.0 version of the MPI standard. 
+   * Uses a prime factorization to split the volume in smaller chunks. */
+  lemonSplitSize(&factor, setup.totalVol * siteSize);
+  if (factor == 0)
+  {
+    fprintf(stderr, "[LEMON] Node %d reports in lemonWriteLatticeParallel:\n"
+                    "        Had issues in factorizing the total volume to fit integer dataype.\n", writer->my_rank);
+    return LEMON_ERR_WRITE;
+  }
+  MPI_Type_contiguous(factor, MPI_BYTE, &factype);
+  MPI_Type_commit(&factype);
+  MPI_Get_count(&status, factype, &written);
+  MPI_Type_free(&factype);
+  if (written != ((siteSize * setup.localVol) / factor))
   {
     fprintf(stderr, "[LEMON] Node %d reports in lemonWriteLatticeParallel:\n"
                     "        Could not write the required amount of data.\n", writer->my_rank);

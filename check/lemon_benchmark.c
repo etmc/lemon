@@ -48,7 +48,7 @@ int main(int argc, char **argv)
   int mpisize;
   int rank;
   char const *type;
-  int ldsize;
+  size_t ldsize;
   unsigned long long int fsize;
   int *hashMatch, *hashMatchAll;
   double const rscale = 1.0 / RAND_MAX;
@@ -63,7 +63,8 @@ int main(int argc, char **argv)
   int latVol = localVol;
 
   MPI_Comm cartesian;
-  int i, j;
+  int i;
+  size_t j;
 
   md5_state_t state;
   md5_byte_t before[16];
