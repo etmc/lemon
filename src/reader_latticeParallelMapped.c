@@ -32,13 +32,17 @@
 #include "internal_clearReaderState.static"
 #include "internal_setupIOTypes.static"
 #include "internal_freeIOTypes.static"
+#include "internal_splitSize.static"
 
 int lemonReadLatticeParallelMapped(LemonReader *reader, void *data, MPI_Offset siteSize, int const *latticeDims, int const *mapping)
 {
-  int        read;
-  int        error;
-  MPI_Status status;
-  LemonSetup setup;
+  int          read;
+  int          error;
+  int          factor;
+  MPI_Status   status;
+  MPI_Datatype factype;
+  LemonSetup   setup;
+  size_t       total;
 
   error = lemonClearReaderState(reader);
   if (error != LEMON_SUCCESS)
@@ -55,8 +59,19 @@ int lemonReadLatticeParallelMapped(LemonReader *reader, void *data, MPI_Offset s
   MPI_Barrier(reader->cartesian);
 
   /* Synchronize the file pointer */
-  MPI_Get_count(&status, MPI_BYTE, &read);
-  reader->pos += setup.totalVol * siteSize;
+  total = (size_t)setup.totalVol * (size_t)siteSize;
+  factor = lemonSplitSize(total);
+  if (factor == 0)
+  {
+    fprintf(stderr, "[LEMON] Node %d reports in lemonReadLatticeParallelMapped:\n"
+                    "        Had issues in factorizing the total volume to fit integer dataype.\n", reader->my_rank);
+    return LEMON_ERR_READ;
+  }
+  MPI_Type_contiguous(factor, MPI_BYTE, &factype);
+  MPI_Type_commit(&factype);
+  MPI_Get_count(&status, factype, &read);
+  MPI_Type_free(&factype);
+  reader->pos += total;
 
   /* We want to leave the file in a well-defined state, so we reset the view to a default. */
   /* We don't want to reread any data, so we maximize the file pointer globally. */
@@ -66,9 +81,9 @@ int lemonReadLatticeParallelMapped(LemonReader *reader, void *data, MPI_Offset s
   lemonFreeIOTypes(&setup);
 
   /* Doing a data read should never get us to EOF, only header scanning -- any shortfall is an error */
-  if (read != siteSize * setup.localVol)
+  if (read != (total / factor))
   {
-    fprintf(stderr, "[LEMON] Node %d reports in lemonReadLatticeParallel:\n"
+    fprintf(stderr, "[LEMON] Node %d reports in lemonReadLatticeParallelMapped:\n"
                     "        Could not read the required amount of data.\n", reader->my_rank);
     return LEMON_ERR_READ;
   }

@@ -32,12 +32,15 @@
 #include "internal_clearWriterState.static"
 #include "internal_setupIOTypes.static"
 #include "internal_freeIOTypes.static"
+#include "internal_splitSize.static"
 
 int lemonWriteLatticeParallelNonBlockingMapped(LemonWriter *writer, void *data, MPI_Offset siteSize, int const *latticeDims, int const *mapping)
 {
   int        error;
   LemonSetup setup;
-
+  int        factor;
+  size_t     total;
+  
   error = lemonClearWriterState(writer);
   if (error != LEMON_SUCCESS)
     return error;
@@ -57,7 +60,7 @@ int lemonWriteLatticeParallelNonBlockingMapped(LemonWriter *writer, void *data, 
   writer->is_busy = 1;
   writer->is_collective = 1;
   writer->buffer = data;
-  writer->bytes_wanted = setup.totalVol * siteSize;
+  writer->bytes_wanted = (size_t)setup.totalVol * (size_t)siteSize;
 
   MPI_Barrier(writer->cartesian);
 

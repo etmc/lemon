@@ -50,7 +50,7 @@ typedef struct
 
   /* Data needed for tracking I/O requests */
   void *buffer;
-  int bytes_wanted;
+  size_t bytes_wanted;
 } LemonReader;
 
 /* Reader manipulators */

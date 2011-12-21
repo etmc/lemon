@@ -43,13 +43,15 @@ int lemonWriteLatticeParallelMapped(LemonWriter *writer, void *data, MPI_Offset 
   MPI_Status   status;
   MPI_Datatype factype;
   LemonSetup   setup;
-
+  size_t       total;
+  
   error = lemonClearWriterState(writer);
   if (error != LEMON_SUCCESS)
     return error;
 
   lemonSetupIOTypes(&setup, writer->cartesian, siteSize, latticeDims, mapping);
-
+  total = (size_t)setup.totalVol * (size_t)siteSize;
+  
   /* Install the data organization we worked out above on the file as a view */
   MPI_Barrier(writer->cartesian);
   MPI_File_set_view(*writer->fp, writer->off + writer->pos, setup.etype, setup.ftype, "native", MPI_INFO_NULL);
@@ -59,8 +61,7 @@ int lemonWriteLatticeParallelMapped(LemonWriter *writer, void *data, MPI_Offset 
   MPI_File_sync(*writer->fp);
 
   MPI_Barrier(writer->cartesian);
-
-  writer->pos += setup.totalVol * siteSize;
+  writer->pos += total;
 
   /* We should reset the shared file pointer, in an MPI_BYTE based view... */
   MPI_Barrier(writer->cartesian);
@@ -72,7 +73,7 @@ int lemonWriteLatticeParallelMapped(LemonWriter *writer, void *data, MPI_Offset 
   /* Workaround to avoid integer overflows for filesizes > 2G, 
    * should be fixed in the 3.0 version of the MPI standard. 
    * Uses a prime factorization to split the volume in smaller chunks. */
-  lemonSplitSize(&factor, setup.totalVol * siteSize);
+  factor = lemonSplitSize(total);
   if (factor == 0)
   {
     fprintf(stderr, "[LEMON] Node %d reports in lemonWriteLatticeParallel:\n"
@@ -83,7 +84,7 @@ int lemonWriteLatticeParallelMapped(LemonWriter *writer, void *data, MPI_Offset 
   MPI_Type_commit(&factype);
   MPI_Get_count(&status, factype, &written);
   MPI_Type_free(&factype);
-  if (written != ((siteSize * setup.localVol) / factor))
+  if (written != (total / factor))
   {
     fprintf(stderr, "[LEMON] Node %d reports in lemonWriteLatticeParallel:\n"
                     "        Could not write the required amount of data.\n", writer->my_rank);

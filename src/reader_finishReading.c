@@ -27,13 +27,16 @@
 #include <config.h>
 #include <lemon.h>
 #include <stdio.h>
+#include "internal_splitSize.static"
 
 int lemonFinishReading(LemonReader *reader)
 {
   int read;
   int size;
+  int factor;
   MPI_Status status;
-  char MPImode[] = "native";
+  char MPImode[] = "native";  
+  MPI_Datatype factype;
 
   if (!reader->is_busy)
     return LEMON_SUCCESS;
@@ -46,10 +49,21 @@ int lemonFinishReading(LemonReader *reader)
   MPI_File_set_view(*reader->fp, reader->off, MPI_BYTE, MPI_BYTE, MPImode, MPI_INFO_NULL);
   MPI_File_seek(*reader->fp, reader->pos, MPI_SEEK_SET);
 
-  MPI_Get_count(&status, MPI_BYTE, &read);
+  factor = lemonSplitSize(reader->bytes_wanted);
+  if (factor == 0)
+  {
+    fprintf(stderr, "[LEMON] Node %d reports in lemonFinishReading:\n"
+                    "        Had issues in factorizing the total volume to fit integer dataype.\n", reader->my_rank);
+    return LEMON_ERR_READ;
+  }
+
+  MPI_Type_contiguous(factor, MPI_BYTE, &factype);
+  MPI_Type_commit(&factype);
+  MPI_Get_count(&status, factype, &read);
+  MPI_Type_free(&factype);
 
   /* Doing a data read should never get us to EOF, only header scanning */
-  if (read != (reader->is_striped ? reader->bytes_wanted / size : reader->bytes_wanted))
+  if (read != (reader->is_striped ? reader->bytes_wanted / (size * factor) : (reader->bytes_wanted / factor)))
   {
     fprintf(stderr, "[LEMON] Node %d reports in lemonFinishReading:\n"
                     "        Could not read the required amount of data.\n", reader->my_rank);

@@ -32,6 +32,7 @@
 #include "internal_clearReaderState.static"
 #include "internal_setupIOTypes.static"
 #include "internal_freeIOTypes.static"
+#include "internal_splitSize.static"
 
 int lemonReadLatticeParallelNonBlockingMapped(LemonReader *reader, void *data, MPI_Offset siteSize, int const *latticeDims, int const *mapping)
 {
@@ -54,7 +55,7 @@ int lemonReadLatticeParallelNonBlockingMapped(LemonReader *reader, void *data, M
   reader->is_busy = 1;
   reader->is_striped = 1;
   reader->buffer = data;
-  reader->bytes_wanted = setup.totalVol * siteSize;
+  reader->bytes_wanted = (size_t)setup.totalVol * (size_t)siteSize;
 
   lemonFreeIOTypes(&setup);
 

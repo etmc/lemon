@@ -52,7 +52,7 @@ typedef struct
   /* Data needed for tracking I/O requests */
   void *buffer;
   MPI_Request request;
-  int bytes_wanted;
+  size_t bytes_wanted;
   MPI_Offset data_length;
 } LemonWriter;
 

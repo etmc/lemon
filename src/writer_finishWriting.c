@@ -27,12 +27,15 @@
 #include <config.h>
 #include <lemon.h>
 #include <stdio.h>
+#include "internal_splitSize.static"
 
 int lemonFinishWriting(LemonWriter *writer)
 {
   int written;
   int size;
+  int factor;
   MPI_Status status;
+  MPI_Datatype factype;
 
   if (!writer->is_busy)
     return LEMON_SUCCESS;
@@ -46,16 +49,27 @@ int lemonFinishWriting(LemonWriter *writer)
   MPI_File_set_view(*writer->fp, writer->off, MPI_BYTE, MPI_BYTE, "native", MPI_INFO_NULL);
   MPI_File_seek(*writer->fp, writer->pos, MPI_SEEK_SET);
 
-  MPI_Get_count(&status, MPI_BYTE, &written);
+  factor = lemonSplitSize(writer->bytes_wanted);
+  if (factor == 0)
+  {
+    fprintf(stderr, "[LEMON] Node %d reports in lemonFinishWriting:\n"
+                    "        Had issues in factorizing the total volume to fit integer dataype.\n", writer->my_rank);
+    return LEMON_ERR_WRITE;
+  }
+
+  MPI_Type_contiguous(factor, MPI_BYTE, &factype);
+  MPI_Type_commit(&factype);
+  MPI_Get_count(&status, factype, &written);
+  MPI_Type_free(&factype);
 
   if (writer->is_collective)
   {
     MPI_Comm_size(writer->cartesian, &size);
-    if (written != writer->bytes_wanted / size)
+    if (written != writer->bytes_wanted / (size * factor))
     {
       fprintf(stderr, "[LEMON] Node %d reports in lemonFinishWriting:\n"
                       "        Could not write the required amount of data.\n", writer->my_rank);
-      fprintf(stderr, "        needed: %d, written: %d\n", writer->bytes_wanted / size , written);
+      fprintf(stderr, "        needed: %d, written: %d\n", (int)(writer->bytes_wanted / size) , (int)(written * factor));
       return LEMON_ERR_WRITE;
     }
   }
@@ -66,7 +80,7 @@ int lemonFinishWriting(LemonWriter *writer)
     {
       fprintf(stderr, "[LEMON] Node %d reports in lemonFinishWriting:\n"
                       "        Could not write the required amount of data.\n", writer->my_rank);
-      fprintf(stderr, "        needed: %d, written: %d\n", writer->bytes_wanted / size , written);
+      fprintf(stderr, "        needed: %d, written: %d\n", (int)(writer->bytes_wanted / size), (int)(written * factor));
       return LEMON_ERR_WRITE;
     }
   }

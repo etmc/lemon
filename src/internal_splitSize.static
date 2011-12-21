@@ -2,23 +2,22 @@
 
 #include <limits.h>
 
-static void lemonSplitSize(int* factor, size_t orig)
+static int lemonSplitSize(size_t orig)
 { 
   if (orig < ((size_t)INT_MAX * (size_t)INT_MAX))
   {
     size_t base = orig;
     size_t run = 2;
-    *factor = 1;
+    int factor = 1;
     while ((base > (size_t)INT_MAX) && (run < base))
     {
       while ((base % run) && (run < base))
 	++run;
       base /= run;
-      *factor *= run;
+      factor *= run;
     }
-    if (orig == base * (size_t)(*factor))  
-      return;
+    if (orig == base * (size_t)factor)  
+      return factor;
   }
-  factor = 0;
-  return;
+  return 0;
 }
