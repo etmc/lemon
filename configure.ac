@@ -5,6 +5,7 @@ AC_CONFIG_SRCDIR([src/header_construct.c])
 AC_CONFIG_HEADERS([include/config.h])
 
 # Checks for programs.
+AM_PROG_AR
 AC_PROG_CC
 AC_PROG_RANLIB
 
