@@ -35,7 +35,7 @@
 
 int lemonWriteLatticeParallelMapped(LemonWriter *writer, void *data, MPI_Offset siteSize, int const *latticeDims, int const *mapping)
 {
-  MPI_Offset written;
+  int        written;
   int        error;
   MPI_Status status;
   LemonSetup setup;

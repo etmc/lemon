@@ -26,7 +26,7 @@
 
 #pragma once
 
-#include "internal_split.static"
+#include "internal_chainDecomposeEtype.static"
 
 static void lemonSetupIOTypes(LemonSetup *setup, MPI_Comm cartesian, MPI_Offset siteSize, int const *latticeDims, int const *mapping)
 {
@@ -45,25 +45,7 @@ static void lemonSetupIOTypes(LemonSetup *setup, MPI_Comm cartesian, MPI_Offset 
      Note that we always assume we obtained this as raw binary data of the correct type,
      because apparently we cannot trust MPI libraries to deal with conversions internally. */
   
-  /* Refactor all of this! */
-  MPI_Offset mult = lemonSplit(&siteSize);
-  while (mult > 1)
-  {
-    MPI_Datatype* tmp_data= setup->etype_int;
-    ++setup->est;
-    
-    setup->etype_int = malloc((setup->est + 1) * sizeof(MPI_Datatype));
-    for (ctr = 0; ctr < setup->est; ++ctr)
-      setup->etype_int[ctr] = tmp_data[ctr];
-    free(tmp_data);
-    
-    MPI_Type_contiguous(siteSize, setup->etype_int[setup->est - 1], &setup->etype_int[setup->est]);
-    MPI_Type_commit(&setup->etype_int[setup->est]);
-    
-    siteSize = mult;
-    mult = lemonSplit(&siteSize);
-  }
-  /* End of refactor block */
+  lemonChainDecomposeEtype(setup, &siteSize); /* Fix potential overflow by chaining non-overflowing sizes. */
     
   MPI_Type_contiguous(siteSize, setup->etype_int[setup->est], &setup->etype);
   MPI_Type_commit(&setup->etype);

@@ -1,0 +1,52 @@
+/*****************************************************************************
+ * LEMON v1.00                                                               *
+ *                                                                           *
+ * This file is part of the LEMON implementation of the SCIDAC LEMON format. *
+ *                                                                           *
+ * It is based directly upon the original c-lemon implementation,            *
+ * as maintained by C. deTar for the USQCD Collaboration,                    *
+ * and inherits its license model and parts of its original code.            *
+ *                                                                           *
+ * LEMON is free software: you can redistribute it and/or modify             *
+ * it under the terms of the GNU General Public License as published by      *
+ * the Free Software Foundation, either version 3 of the License, or         *
+ * (at your option) any later version.                                       *
+ *                                                                           *
+ * LEMON is distributed in the hope that it will be useful,                  *
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of            *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the             *
+ * GNU General Public License for more details. You should have received     *
+ * a copy of the GNU General Public License along with LEMON. If not,        *
+ * see <http://www.gnu.org/licenses/>.                                       *
+ *                                                                           *
+ * LEMON was written for the European Twisted Mass Collaboration.            *
+ * For support requests or bug reports, please contact                       *
+ *    A. Deuzeman (deuzeman@itp.unibe.ch)                                    *
+ *****************************************************************************/
+
+#pragma once
+
+#include "internal_split.static"
+
+static void lemonChainDecomposeEtype(LemonSetup *setup, MPI_Offset *siteSize)
+{
+  int ctr = 0; 
+  MPI_Offset mult = lemonSplit(siteSize);
+  
+  while (mult > 1)
+  {
+    MPI_Datatype* tmp_data= setup->etype_int;
+    ++setup->est;
+    
+    setup->etype_int = malloc((setup->est + 1) * sizeof(MPI_Datatype));
+    for (ctr = 0; ctr < setup->est; ++ctr)
+      setup->etype_int[ctr] = tmp_data[ctr];
+    free(tmp_data);
+    
+    MPI_Type_contiguous(*siteSize, setup->etype_int[setup->est - 1], &setup->etype_int[setup->est]);
+    MPI_Type_commit(&setup->etype_int[setup->est]);
+    
+    *siteSize = mult;
+    mult = lemonSplit(siteSize);
+  }
+}
