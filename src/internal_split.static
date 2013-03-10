@@ -1,9 +1,9 @@
 /*****************************************************************************
- * LEMON v1.01                                                               *
+ * LEMON v1.00                                                               *
  *                                                                           *
- * This file is part of the LEMON implementation of the SCIDAC LIME format.  *
+ * This file is part of the LEMON implementation of the SCIDAC LEMON format. *
  *                                                                           *
- * It is based directly upon the original c-lime implementation,             *
+ * It is based directly upon the original c-lemon implementation,            *
  * as maintained by C. deTar for the USQCD Collaboration,                    *
  * and inherits its license model and parts of its original code.            *
  *                                                                           *
@@ -26,24 +26,23 @@
 
 #pragma once
 
-#include <limits.h>
-#include <mpi.h>
+#include "internal_detectOverflow.static"
 
-typedef struct
+static MPI_Offset lemonSplit(MPI_Offset *siteSize)
 {
-  MPI_Datatype etype;
-  MPI_Datatype ftype;
+  MPI_Offset result = 1;
+  MPI_Offset primeFactor = 2;
 
-  unsigned int est;
-  MPI_Datatype *etype_int;
-  unsigned int fst;
-  MPI_Datatype *ftype_int;
+  while (lemonDetectOverflow(*siteSize) && (primeFactor < *siteSize))
+  {
+    if ((*siteSize) % primeFactor)
+    {
+      *siteSize /= primeFactor;
+      result *= primeFactor;
+    }
+    else
+      ++primeFactor;
+  }
   
-  MPI_Offset ndims;
-  MPI_Offset localVol;
-  MPI_Offset totalVol;
-
-  MPI_Offset *starts;
-  MPI_Offset *localDims;
-  MPI_Offset *mappedDims;
-} LemonSetup;
+  return result;
+}
