@@ -39,11 +39,11 @@ typedef struct
   unsigned int fst;
   MPI_Datatype *ftype_int;
   
-  MPI_Offset ndims;
+  int ndims;
   MPI_Offset localVol;
   MPI_Offset totalVol;
 
-  MPI_Offset *starts;
-  MPI_Offset *localDims;
-  MPI_Offset *mappedDims;
+  int *starts;
+  int *localDims;
+  int *mappedDims;
 } LemonSetup;

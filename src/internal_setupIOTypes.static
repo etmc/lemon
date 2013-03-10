@@ -30,6 +30,7 @@
 
 static void lemonSetupIOTypes(LemonSetup *setup, MPI_Comm cartesian, MPI_Offset siteSize, int const *latticeDims, int const *mapping)
 {
+  int ctr = 0;
   MPI_Offset idx = 0;
   int *mpiCoords = (int*)NULL;
   int *mpiDims = (int*)NULL;
@@ -37,7 +38,7 @@ static void lemonSetupIOTypes(LemonSetup *setup, MPI_Comm cartesian, MPI_Offset 
 
   setup->est = 0;
   setup->etype_int = (MPI_Datatype*)malloc(sizeof(MPI_Datatype));
-  int MPI_Type_dup(MPI_BYTE, setup->etype_int)
+  MPI_Type_dup(MPI_BYTE, setup->etype_int);
  
   /* Set up data types and file view */
   /* Elementary datatype for reading/writing: a single lattice site of the correct size.
@@ -52,8 +53,8 @@ static void lemonSetupIOTypes(LemonSetup *setup, MPI_Comm cartesian, MPI_Offset 
     ++setup->est;
     
     setup->etype_int = malloc((setup->est + 1) * sizeof(MPI_Datatype));
-    for (unsigned int ctr = 0; ctr < setup->est; ++ctr)
-      setup->etype_int[ctr] = setup->tmp_data[ctr];
+    for (ctr = 0; ctr < setup->est; ++ctr)
+      setup->etype_int[ctr] = tmp_data[ctr];
     free(tmp_data);
     
     MPI_Type_contiguous(siteSize, setup->etype_int[setup->est - 1], &setup->etype_int[setup->est]);
@@ -70,15 +71,15 @@ static void lemonSetupIOTypes(LemonSetup *setup, MPI_Comm cartesian, MPI_Offset 
   /* Gathering of the required MPI data from the cartesian communicator. */
   MPI_Cartdim_get(cartesian, &setup->ndims);
 
-  setup->starts = (int*)malloc(setup->ndims * sizeof(int));
-  setup->localDims = (int*)malloc(setup->ndims * sizeof(int));
-  setup->mappedDims = (int*)malloc(setup->ndims * sizeof(int));
+  setup->starts = (int*)calloc(setup->ndims, sizeof(int));
+  setup->localDims = (int*)calloc(setup->ndims, sizeof(int));
+  setup->mappedDims = (int*)calloc(setup->ndims, sizeof(int));
   setup->localVol = 1;
   setup->totalVol = 1;
 
-  mpiCoords = (MPI_Offset*)malloc(setup->ndims * sizeof(MPI_Offset));
-  mpiDims = (MPI_Offset*)malloc(setup->ndims * sizeof(MPI_Offset));
-  period  = (MPI_Offset*)malloc(setup->ndims * sizeof(MPI_Offset));
+  mpiCoords = (int*)calloc(setup->ndims, sizeof(int));
+  mpiDims = (int*)calloc(setup->ndims, sizeof(int));
+  period  = (int*)calloc(setup->ndims, sizeof(int));
 
   MPI_Cart_get(cartesian, setup->ndims, mpiDims, period, mpiCoords);
 
@@ -97,27 +98,7 @@ static void lemonSetupIOTypes(LemonSetup *setup, MPI_Comm cartesian, MPI_Offset 
 
   setup->fst = 0;
   setup->ftype_int = (MPI_Datatype*)NULL;
-  
-  /* Refactor all of this! redSize can be siteSize, actually...*/
-  MPI_Offset mult = lemonSplit(&siteSize);
-  while (mult > 1)
-  {
-    MPI_Datatype* tmp_data= setup->etype_int;
-    ++setup->est;
-    
-    setup->etype_int = malloc((setup->est + 1) * sizeof(MPI_Datatype));
-    for (unsigned int ctr = 0; ctr < setup->est; ++ctr)
-      setup->etype_int[ctr] = setup->tmp_data[ctr];
-    free(tmp_data);
-    
-    MPI_Type_contiguous(siteSize, setup->etype_int[setup->est - 1], &setup->etype_int[setup->est]);
-    MPI_Type_commit(&setup->etype_int[setup->est]);
-    
-    siteSize = mult;
-    mult = lemonSplit(&siteSize);
-  }
-  /* End of refactor block */
-  
+   
   /* Build up a filetype that provides the right offsets for the reading of a N-dimensional lattice. */
   MPI_Type_create_subarray(setup->ndims, setup->mappedDims, setup->localDims, setup->starts,
 			   MPI_ORDER_C, setup->etype, &setup->ftype);
