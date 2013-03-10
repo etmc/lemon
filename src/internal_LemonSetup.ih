@@ -29,21 +29,22 @@
 #include <limits.h>
 #include <mpi.h>
 
-typedef struct
+typedef struct LemonSetup
 {
-  MPI_Datatype etype;
-  MPI_Datatype ftype;
+  MPI_Datatype  etype;
+  MPI_Datatype  ftype;
 
-  unsigned int est;
+  unsigned int  est;
   MPI_Datatype *etype_int;
-  unsigned int fst;
-  MPI_Datatype *ftype_int;
+  MPI_Offset    esize;
   
   int ndims;
-  MPI_Offset localVol;
-  MPI_Offset totalVol;
+  int localVol; /* Total numbet of etype's written/read -- MPI limited to int. */
+  MPI_Offset totalVol; /* Only used internally. */
 
   int *starts;
   int *localDims;
   int *mappedDims;
+  
+  int striped_flag;
 } LemonSetup;

@@ -52,6 +52,8 @@ LemonWriter* lemonCreateWriter(MPI_File *fp, MPI_Comm cartesian)
 
   MPI_Comm_dup(cartesian, &result->cartesian);
   MPI_Comm_rank(cartesian, &result->my_rank);
+  
+  result->setup = NULL;
 
   return result;
 }

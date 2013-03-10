@@ -30,9 +30,9 @@
 
 static void lemonChainDecomposeEtype(LemonSetup *setup, MPI_Offset *siteSize)
 {
-  int ctr = 0; 
+  int ctr = 0;
   MPI_Offset mult = lemonSplit(siteSize);
-  
+ 
   while (mult > 1)
   {
     MPI_Datatype* tmp_data= setup->etype_int;

@@ -28,6 +28,8 @@
 
 #include "lemon_header.h"
 
+struct LemonSetup;
+
 typedef struct
 {
   /* Binary structure */
@@ -50,7 +52,7 @@ typedef struct
 
   /* Data needed for tracking I/O requests */
   void *buffer;
-  int bytes_wanted;
+  struct LemonSetup *setup;
 } LemonReader;
 
 /* Reader manipulators */
@@ -77,6 +79,6 @@ int lemonReadLatticeParallel(LemonReader *reader, void *data, MPI_Offset siteSiz
 int lemonReadLatticeParallelMapped(LemonReader *reader, void *data, MPI_Offset siteSize, int const *latticeDims, int const *mapping);
 int lemonReadLatticeParallelNonBlocking(LemonReader *reader, void *data, MPI_Offset siteSize, int const *latticeDims);
 int lemonReadLatticeParallelNonBlockingMapped(LemonReader *reader, void *data, MPI_Offset siteSize, int const *latticeDims, int const *mapping);
-int lemonReaderReadDataNonBlocking(void *dest, MPI_Offset const *nbytes, LemonReader *reader);
+int lemonReaderReadDataNonBlocking(void *dest, MPI_Offset *nbytes, LemonReader *reader);
 int lemonFinishReading(LemonReader *reader);
 

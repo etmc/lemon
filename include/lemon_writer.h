@@ -28,6 +28,8 @@
 
 #include "lemon_header.h"
 
+struct LemonSetup;
+
 typedef struct
 {
   /* Binary structure */
@@ -52,8 +54,8 @@ typedef struct
   /* Data needed for tracking I/O requests */
   void *buffer;
   MPI_Request request;
-  int bytes_wanted;
-  MPI_Offset data_length;
+  MPI_Offset data_length; 
+  struct LemonSetup *setup;
 } LemonWriter;
 
 /* Writer manipulators */

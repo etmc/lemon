@@ -1,9 +1,9 @@
 /*****************************************************************************
- * LEMON v1.01                                                               *
+ * LEMON v1.00                                                               *
  *                                                                           *
- * This file is part of the LEMON implementation of the SCIDAC LIME format.  *
+ * This file is part of the LEMON implementation of the SCIDAC LEMON format. *
  *                                                                           *
- * It is based directly upon the original c-lime implementation,             *
+ * It is based directly upon the original c-lemon implementation,            *
  * as maintained by C. deTar for the USQCD Collaboration,                    *
  * and inherits its license model and parts of its original code.            *
  *                                                                           *
@@ -24,43 +24,20 @@
  *    A. Deuzeman (deuzeman@itp.unibe.ch)                                    *
  *****************************************************************************/
 
-#include <config.h>
-#include <lemon.h>
-#include <stdio.h>
+#pragma once
 
 #include "internal_LemonSetup.ih"
-#include "internal_setupTypeChain.static"
+#include "internal_chainDecomposeEtype.static"
 
-int lemonWriteRecordDataNonBlocking(void *source, MPI_Offset const *nbytes, LemonWriter* writer)
+static void lemonSetupTypeChain(struct LemonSetup **setup, MPI_Offset nbytes)
 {
-  int err;
+  *setup = (struct LemonSetup*)malloc(sizeof(struct LemonSetup));
+  struct LemonSetup *dsetup = *setup;
+  
+  dsetup->esize = nbytes;
 
-  if (source == NULL || nbytes == 0 || writer == (LemonWriter*)NULL)
-  {
-    fprintf(stderr, "[LEMON] Node %d reports in lemonWriteRecordDataNonBlocking:\n"
-                    "        NULL pointer or uninitialized writer provided.\n", writer->my_rank);
-    return LEMON_ERR_PARAM;
-  }
-
-  if (writer->is_busy)
-    lemonFinishWriting(writer);
-
-  lemonSetupTypeChain(&writer->setup, *nbytes);
-  if (writer->my_rank == 0)
-    err = MPI_File_iwrite_at(*writer->fp, writer->off + writer->pos, source, 1, writer->setup->etype, &writer->request);
-
-  writer->is_busy = 1;
-  writer->is_collective = 0;
-  writer->buffer = source;
-
-  MPI_File_sync(*writer->fp);
-  MPI_Bcast(&err, 1, MPI_INT, 0, writer->cartesian);
-
-  if (err != MPI_SUCCESS)
-  {
-    fprintf(stderr, "[LEMON] Node %d reports in lemonWriteRecordDataNonBlocking:\n"
-                    "        MPI_File_iwrite_at returned error %d.\n", writer->my_rank, err);
-    return LEMON_ERR_WRITE;
-  }
-  return LEMON_SUCCESS;
+  lemonChainDecomposeEtype(dsetup, &nbytes); /* Fix potential overflow by chaining non-overflowing sizes. */
+  MPI_Type_contiguous(nbytes, dsetup->etype_int[dsetup->est], &dsetup->etype);
+  MPI_Type_commit(&dsetup->etype);
+  dsetup->striped_flag = 0;
 }

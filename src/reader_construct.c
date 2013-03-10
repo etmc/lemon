@@ -50,6 +50,7 @@ LemonReader* lemonCreateReader(MPI_File *fp, MPI_Comm cartesian)
   MPI_Comm_rank(result->cartesian, &result->my_rank);
 
   result->buffer = NULL;
+  result->setup = NULL;
 
   return result;
 }

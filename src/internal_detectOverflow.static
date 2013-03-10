@@ -26,6 +26,8 @@
 
 #pragma once
 
+#include <limits.h>
+
 inline static int lemonDetectOverflow(MPI_Offset siteSize)
 {
   return (siteSize > INT_MAX);
