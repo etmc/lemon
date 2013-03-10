@@ -48,8 +48,8 @@ int main(int argc, char **argv)
   int mpisize;
   int rank;
   char const *type;
-  int ldsize;
-  unsigned long long int fsize;
+  size_t ldsize;
+  size_t fsize;
   int *hashMatch, *hashMatchAll;
   double const rscale = 1.0 / RAND_MAX;
 
@@ -128,7 +128,7 @@ int main(int argc, char **argv)
     latSizes[i] = locSizes[i] * latDist[i];
   }
   latVol = mpisize * localVol;
-  ldsize = localVol * 72 * sizeof(double);
+  ldsize = (unsigned long long int)localVol * 72 * sizeof(double);
   fsize = (unsigned long long int)latVol * 72 * sizeof(double);
  
   MPI_Cart_create(MPI_COMM_WORLD, 4, latDist, periods, 1, &cartesian);
