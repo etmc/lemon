@@ -1,9 +1,9 @@
 /*****************************************************************************
- * LEMON v1.00                                                               *
+ * LEMON v1.01                                                               *
  *                                                                           *
- * This file is part of the LEMON implementation of the SCIDAC LEMON format. *
+ * This file is part of the LEMON implementation of the SCIDAC LIME format.  *
  *                                                                           *
- * It is based directly upon the original c-lemon implementation,            *
+ * It is based directly upon the original c-lime implementation,             *
  * as maintained by C. deTar for the USQCD Collaboration,                    *
  * and inherits its license model and parts of its original code.            *
  *                                                                           *
