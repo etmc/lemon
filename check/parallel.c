@@ -1,5 +1,5 @@
 /*****************************************************************************
- * LEMON v1.01                                                               *
+ * LEMON v1.1                                                                *
  *                                                                           *
  * This file is part of the LEMON implementation of the SCIDAC LIME format.  *
  *                                                                           *
@@ -24,6 +24,10 @@
  *    A. Deuzeman (deuzeman@itp.unibe.ch)                                    *
  *****************************************************************************/
 
+<<<<<<< HEAD
+=======
+#include <lemon.h>
+>>>>>>> Update copyright message.
 #include <stdio.h>
 #include <string.h>
 
