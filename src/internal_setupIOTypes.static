@@ -82,7 +82,7 @@ static void lemonSetupIOTypes(LemonSetup **setup, MPI_Comm cartesian, MPI_Offset
   /* Set up data types and file view */
   
   /* Elementary datatype for reading/writing: a single lattice site of the correct size. */
-  dsetup->est = 0;
+  dsetup->est = 1;
   dsetup->etype_int = (MPI_Datatype*)malloc(sizeof(MPI_Datatype));
   MPI_Type_dup(MPI_BYTE, dsetup->etype_int);
   

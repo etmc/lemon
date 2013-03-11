@@ -36,7 +36,6 @@ static void lemonChainDecomposeEtype(LemonSetup *setup, MPI_Offset *siteSize)
   while (mult > 1)
   {
     MPI_Datatype* tmp_data= setup->etype_int;
-    ++setup->est;
     
     setup->etype_int = malloc((setup->est + 1) * sizeof(MPI_Datatype));
     for (ctr = 0; ctr < setup->est; ++ctr)
@@ -45,6 +44,7 @@ static void lemonChainDecomposeEtype(LemonSetup *setup, MPI_Offset *siteSize)
     
     MPI_Type_contiguous(*siteSize, setup->etype_int[setup->est - 1], &setup->etype_int[setup->est]);
     MPI_Type_commit(&setup->etype_int[setup->est]);
+    ++setup->est;
     
     *siteSize = mult;
     mult = lemonSplit(siteSize);
