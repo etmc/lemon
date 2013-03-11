@@ -46,7 +46,7 @@ int lemonWriteLatticeParallelMapped(LemonWriter *writer, void *data, MPI_Offset 
   /* We will pass siteSize by pointer, because we want to scale to the largest contiguous region.
    * Afterwards, and internal to these functions, siteSize will contain the number of bytes in the elementary datatype. */
   lemonSetupIOTypes(&writer->setup, writer->cartesian, siteSize, latticeDims, mapping);
-
+  
   /* Install the data organization we worked out above on the file as a view */
   MPI_Barrier(writer->cartesian);
   MPI_File_set_view(*writer->fp, writer->off + writer->pos, writer->setup->etype, writer->setup->ftype, "native", MPI_INFO_NULL);

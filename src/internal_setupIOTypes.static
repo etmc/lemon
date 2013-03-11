@@ -38,7 +38,6 @@ static void lemonSetupIOTypes(LemonSetup **setup, MPI_Comm cartesian, MPI_Offset
   
   *setup = (LemonSetup*)malloc(sizeof(LemonSetup));
   LemonSetup *dsetup = *setup;
-  dsetup->esize = siteSize;
 
   /* Gathering of the required MPI data from the cartesian communicator. */
   MPI_Cartdim_get(cartesian, &dsetup->ndims);
@@ -64,7 +63,8 @@ static void lemonSetupIOTypes(LemonSetup **setup, MPI_Comm cartesian, MPI_Offset
      This means taking the innermost local size Lz and creating a sequence of Lz * siteSize bytes
      as our elementary type. The local and global volumes will, of course, scale down by a factor Lz
      accordingly! */
-  dsetup->esize *= (dsetup->mappedDims[0] / mpiDims[mapping[0]]);
+  siteSize *= (dsetup->mappedDims[0] / mpiDims[mapping[0]]);
+  dsetup->esize = siteSize;
   dsetup->localDims[0] = 1;
   dsetup->starts[0] = dsetup->localDims[0] * mpiCoords[mapping[0]];
   
@@ -80,16 +80,7 @@ static void lemonSetupIOTypes(LemonSetup **setup, MPI_Comm cartesian, MPI_Offset
   free(mpiCoords);
 
   /* Set up data types and file view */
-  
-  /* Elementary datatype for reading/writing: a single lattice site of the correct size. */
-  dsetup->est = 1;
-  dsetup->etype_int = (MPI_Datatype*)malloc(sizeof(MPI_Datatype));
-  MPI_Type_dup(MPI_BYTE, dsetup->etype_int);
-  
-  lemonChainDecomposeEtype(dsetup, &siteSize); /* Fix potential overflow by chaining non-overflowing sizes. */
-    
-  MPI_Type_contiguous(siteSize, dsetup->etype_int[dsetup->est], &dsetup->etype);
-  MPI_Type_commit(&dsetup->etype);
+  lemonChainDecomposeEtype(dsetup, siteSize); /* Fix potential overflow by chaining non-overflowing sizes. */
    
   /* Build up a filetype that provides the right offsets for the reading of a N-dimensional lattice. */
   MPI_Type_create_subarray(dsetup->ndims, dsetup->mappedDims, dsetup->localDims, dsetup->starts,

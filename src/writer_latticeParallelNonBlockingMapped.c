@@ -36,7 +36,6 @@ int lemonWriteLatticeParallelNonBlockingMapped(LemonWriter *writer, void *data, 
 {
   int        error;
   LemonSetup setup;
-  MPI_Offset bytes_wanted;
 
   error = lemonClearWriterState(writer);
   if (error != LEMON_SUCCESS)

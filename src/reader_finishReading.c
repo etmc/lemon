@@ -64,10 +64,7 @@ int lemonFinishReading(LemonReader *reader)
     return LEMON_ERR_READ;
   }
   
-  if (reader->is_striped)
-    bytes_wanted = reader->setup->totalVol * reader->setup->esize;
-  else
-    bytes_wanted = reader->setup->esize;
+  bytes_wanted = reader->setup->totalVol * reader->setup->esize;
     
   reader->pos += bytes_wanted;
   if ((bytes_wanted < 0) || (reader->pos < 0))

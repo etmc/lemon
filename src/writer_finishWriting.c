@@ -35,7 +35,6 @@
 int lemonFinishWriting(LemonWriter *writer)
 {
   int written;
-  int size;
   MPI_Offset bytes_wanted;
   MPI_Status status;
 

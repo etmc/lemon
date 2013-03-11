@@ -35,8 +35,8 @@ typedef struct LemonSetup
   MPI_Datatype  ftype;
 
   unsigned int  est;
-  MPI_Datatype *etype_int;
-  MPI_Offset    esize;
+  MPI_Datatype **etype_int;
+  MPI_Offset	esize;
   
   int ndims;
   int localVol; /* Total numbet of etype's written/read -- MPI limited to int. */

@@ -28,25 +28,37 @@
 
 #include "internal_split.static"
 
-static void lemonChainDecomposeEtype(LemonSetup *setup, MPI_Offset *siteSize)
+static void lemonChainDecomposeEtype(LemonSetup *setup, MPI_Offset siteSize)
 {
   int ctr = 0;
-  MPI_Offset mult = lemonSplit(siteSize);
- 
+  
+  MPI_Offset mult = lemonSplit(&siteSize);
+  
+  setup->est = 0;
+  
+  setup->etype_int = (MPI_Datatype**)malloc(sizeof(MPI_Datatype*));
+  setup->etype_int[setup->est] = (MPI_Datatype*)malloc(sizeof(MPI_Datatype));
+  MPI_Type_dup(MPI_BYTE, setup->etype_int[setup->est]);
+  ++setup->est;
+  
   while (mult > 1)
   {
-    MPI_Datatype* tmp_data= setup->etype_int;
+    MPI_Datatype** tmp_data= setup->etype_int;
     
-    setup->etype_int = malloc((setup->est + 1) * sizeof(MPI_Datatype));
+    setup->etype_int = (MPI_Datatype**)calloc(setup->est + 1, sizeof(MPI_Datatype*));
     for (ctr = 0; ctr < setup->est; ++ctr)
       setup->etype_int[ctr] = tmp_data[ctr];
     free(tmp_data);
     
-    MPI_Type_contiguous(*siteSize, setup->etype_int[setup->est - 1], &setup->etype_int[setup->est]);
-    MPI_Type_commit(&setup->etype_int[setup->est]);
+    setup->etype_int[setup->est] = (MPI_Datatype*)malloc(sizeof(MPI_Datatype));
+    MPI_Type_contiguous(siteSize, *setup->etype_int[setup->est - 1], setup->etype_int[setup->est]);
+    MPI_Type_commit(setup->etype_int[setup->est]);
     ++setup->est;
     
-    *siteSize = mult;
-    mult = lemonSplit(siteSize);
+    siteSize = mult;
+    mult = lemonSplit(&siteSize);
   }
+  
+  MPI_Type_contiguous(siteSize, *setup->etype_int[setup->est - 1], &setup->etype);
+  MPI_Type_commit(&setup->etype);
 }
