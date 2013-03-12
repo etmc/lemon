@@ -35,7 +35,9 @@ static void lemonSetupTypeChain(struct LemonSetup **setup, MPI_Offset nbytes)
   struct LemonSetup *dsetup = *setup;
   dsetup->esize = nbytes;
   lemonChainDecomposeEtype(dsetup, nbytes); /* Fix potential overflow by chaining non-overflowing sizes. */
-  dsetup->localVol = 1; /* We will use this to multiply with the esize later -- esize already equals nbytes. */
-  dsetup->totalVol = 1; /* We will use this to multiply with the esize later -- esize already equals nbytes. */
+   
+  /* We will use the following volumes to multiply with the esize later -- esize already equals nbytes here. */
+  dsetup->localVol = 1;
+  dsetup->totalVol = 1;
   dsetup->striped_flag = 0;  
 }
