@@ -25,11 +25,11 @@
  *****************************************************************************/
 
 #include <math.h>
-#include <lemon.h>
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
 
+#include "../include/lemon.h"
 #include "md5.h"
 
 char const *humanForm(unsigned long long int filesize);

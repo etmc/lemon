@@ -26,9 +26,10 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <lemon.h>
 #include <mpi.h>
 #define MAX_BYTES 0x1000
+
+#include "../include/lemon.h"
 
 /* Scan for non-ASCII characters */
 /* Return true if all characters are ASCII */

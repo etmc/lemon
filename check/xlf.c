@@ -25,11 +25,12 @@
  *****************************************************************************/
 
 #include <mpi.h>
-#include <lemon.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/time.h>
 #include <time.h>
+
+#include "../include/lemon.h"
 
 int main(int argc, char **argv)
 {
