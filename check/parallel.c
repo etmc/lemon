@@ -24,9 +24,10 @@
  *    A. Deuzeman (deuzeman@itp.unibe.ch)                                    *
  *****************************************************************************/
 
-#include <lemon.h>
 #include <stdio.h>
 #include <string.h>
+
+#include "../include/lemon.h"
 
 int main(int argc, char **argv)
 {
