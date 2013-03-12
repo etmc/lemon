@@ -18,5 +18,6 @@ autom4te.cache/
 ar-lib
 include/stamp-h1
 src/.deps/
+check/.deps/
 *.in
 build
