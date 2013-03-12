@@ -24,10 +24,6 @@
  *    A. Deuzeman (deuzeman@itp.unibe.ch)                                    *
  *****************************************************************************/
 
-<<<<<<< HEAD
-=======
-#include <lemon.h>
->>>>>>> Update copyright message.
 #include <stdio.h>
 #include <string.h>
 
