@@ -46,17 +46,22 @@ int lemonFinishWriting(LemonWriter *writer)
   else if (writer->my_rank == 0)
     MPI_Wait(&writer->request, &status);
 
-  MPI_Get_count(&status, writer->setup->etype, &written);
+  if (writer->is_collective || (writer->my_rank == 0))
+    MPI_Get_count(&status, writer->setup->etype, &written);
+  
+  if (!writer->is_collective)
+    MPI_Bcast(&written, 1, MPI_INT, 0, writer->cartesian);
+  
   MPI_File_set_view(*writer->fp, writer->off, MPI_BYTE, MPI_BYTE, "native", MPI_INFO_NULL);
   MPI_File_seek(*writer->fp, writer->pos, MPI_SEEK_SET);
-
+ 
   if (written < 0)
   {
     fprintf(stderr, "[LEMON] Node %d reports in lemonFinishWriting:\n"
-                    "        Potential integer overflow in etype count.\n", writer->my_rank);
+	    "        Potential integer overflow in etype count.\n", writer->my_rank);
     return LEMON_ERR_WRITE;
   }
-
+ 
   bytes_wanted = writer->setup->totalVol * writer->setup->esize;
   writer->pos += bytes_wanted;
   if ((bytes_wanted < 0) || (writer->pos < 0))
@@ -65,9 +70,6 @@ int lemonFinishWriting(LemonWriter *writer)
                     "        Integer overflow in file pointer adjusting.\n", writer->my_rank);
     return LEMON_ERR_WRITE;
   }
-
-  if (!writer->is_collective)
-    MPI_Bcast(&written, 1, MPI_INT, 0, writer->cartesian);
 
   if (written != writer->setup->localVol)
   {

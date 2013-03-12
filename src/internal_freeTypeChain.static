@@ -34,13 +34,13 @@ static void lemonFreeTypeChain(struct LemonSetup **setup)
   LemonSetup *ds = *setup;
   
   /* Free up the resources. */
-  MPI_Type_free(&ds->ftype);
   for (ctr = ds->est - 1; ctr >= 0; --ctr)
   {
     MPI_Type_free(ds->etype_int[ctr]);
     free(ds->etype_int[ctr]);
   }
   free(ds->etype_int);
+  MPI_Type_free(&ds->etype);
   
   free(ds);
   ds = NULL;
