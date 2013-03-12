@@ -26,8 +26,9 @@
 
 #include <stdio.h>
 #include <mpi.h>
-#include <lemon.h>
 #include <string.h>
+
+#include "../include/lemon.h"
 
 int main(int argc, char **argv)
 {
