@@ -1,1 +1,4 @@
-23.02.2012  Release of version 1.0 of Lemon.
+04.2013  Release of version 1.1 of Lemon.
+         Workaround implemented for integer overflow errors 
+         when working with large local volumes.
+02.2012  Release of version 1.0 of Lemon.

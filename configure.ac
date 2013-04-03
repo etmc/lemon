@@ -1,5 +1,5 @@
 AC_PREREQ(2.53)
-AC_INIT([Lemon], [0.99], [a.deuzeman@rug.nl], [lemon])
+AC_INIT([Lemon], [1.1], [deuzeman@itp.unibe.ch], [lemon])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 AC_CONFIG_SRCDIR([src/header_construct.c])
 AC_CONFIG_HEADERS([include/config.h])
