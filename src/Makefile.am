@@ -2,7 +2,7 @@ AM_CFLAGS = -I@top_srcdir@/include
 
 lib_LIBRARIES = liblemon.a
 
-liblemon_a_SOURCES = header_construct.c reader_closeRecord.c \
+liblemon_a_SOURCES = header_construct.c lemon_versionString.c reader_closeRecord.c \
                      reader_nextRecord.c writer_construct.c header_destroy.c \
                      reader_construct.c reader_padBytes.c writer_destroy.c \
                      reader_destroy.c reader_readData.c writer_latticeParallel.c \

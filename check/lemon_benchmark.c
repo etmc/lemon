@@ -109,6 +109,11 @@ int main(int argc, char **argv)
     MPI_Finalize();
     return 1;
   }
+  else
+  {
+    if (rank == 0)
+      fprintf(stderr, "Benchmarking Lemon %s\n", lemonVersionString());
+  }
   
   L = atoi(argv[1]);
   if (L <= 0)

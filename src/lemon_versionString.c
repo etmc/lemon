@@ -24,15 +24,10 @@
  *    A. Deuzeman (deuzeman@itp.unibe.ch)                                    *
  *****************************************************************************/
 
-#pragma once
+#include <config.h>
+#include <lemon.h>
 
-#include <mpi.h>
-#include <stdint.h>
-#include <stdlib.h>
-
-#include "lemon_defines.h"
-#include "lemon_header.h"
-#include "lemon_reader.h"
-#include "lemon_writer.h"
-
-char const *lemonVersionString();
+char const *lemonVersionString()
+{
+  return VERSION;
+}
