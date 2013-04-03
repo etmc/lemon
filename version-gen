@@ -20,14 +20,14 @@
 # a copy of the GNU General Public License along with LEMON. If not,         #
 # see <http://www.gnu.org/licenses/>.                                        #
 #                                                                            #
-# LEMON was written for the European Twisted Mass Collaboration.             #
-# For support requests or bug reports, please contact                        #
-#    A. Deuzeman (deuzeman@itp.unibe.ch)                                     #
-# 			                             #
 # This script is adapted from GIT-VERSION-GEN, (C) 2012 Bartosz Kostrzewa    #
 #                                                                            #
 # This file has been adapted from GIT-VERSION-GEN from the git distribution. #
 # The original is available from http://git-scm.com/                         #
+# LEMON was written for the European Twisted Mass Collaboration.             #
+# 			                                                     #
+# For support requests or bug reports, please contact                        #
+#    A. Deuzeman (deuzeman@itp.unibe.ch)                                     #
 #                                                                            #
 ##############################################################################
  
@@ -40,6 +40,6 @@ then
   # .git exists and we are in a git repo
   echo $(git describe HEAD)
 else
-  echo "v1.1"
+  echo "r1.1"
 fi
 
