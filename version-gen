@@ -1,0 +1,45 @@
+##############################################################################
+#                                                                            #
+# LEMON v1.1                                                                 #
+#                                                                            #
+# This file is part of the LEMON implementation of the SCIDAC LIME format.   #
+#                                                                            #
+# It is based directly upon the original c-lime implementation,              #
+# as maintained by C. deTar for the USQCD Collaboration,                     #
+# and inherits its license model and parts of its original code.             #
+#                                                                            #
+# LEMON is free software: you can redistribute it and/or modify              #
+# it under the terms of the GNU General Public License as published by       #
+# the Free Software Foundation, either version 3 of the License, or          #
+# (at your option) any later version.                                        #
+#                                                                            #
+# LEMON is distributed in the hope that it will be useful,                   #
+# but WITHOUT ANY WARRANTY; without even the implied warranty of             #
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the              #
+# GNU General Public License for more details. You should have received      #
+# a copy of the GNU General Public License along with LEMON. If not,         #
+# see <http://www.gnu.org/licenses/>.                                        #
+#                                                                            #
+# This script is adapted from GIT-VERSION-GEN, (C) 2012 Bartosz Kostrzewa    #
+#                                                                            #
+# This file has been adapted from GIT-VERSION-GEN from the git distribution. #
+# The original is available from http://git-scm.com/                         #
+# LEMON was written for the European Twisted Mass Collaboration.             #
+# 			                                                     #
+# For support requests or bug reports, please contact                        #
+#    A. Deuzeman (deuzeman@itp.unibe.ch)                                     #
+#                                                                            #
+##############################################################################
+ 
+#!/bin/sh
+
+GIT_BIN=`command -v git`
+
+if test -d .git -o -f .git && test -x ${GIT_BIN}
+then
+  # .git exists and we are in a git repo
+  echo $(git describe HEAD)
+else
+  echo "r1.1"
+fi
+

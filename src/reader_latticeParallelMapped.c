@@ -1,5 +1,5 @@
 /*****************************************************************************
- * LEMON v1.01                                                               *
+ * LEMON v1.1                                                                *
  *                                                                           *
  * This file is part of the LEMON implementation of the SCIDAC LIME format.  *
  *                                                                           *
@@ -38,40 +38,51 @@ int lemonReadLatticeParallelMapped(LemonReader *reader, void *data, MPI_Offset s
   int        read;
   int        error;
   MPI_Status status;
-  LemonSetup setup;
 
   error = lemonClearReaderState(reader);
   if (error != LEMON_SUCCESS)
     return error;
-
-  lemonSetupIOTypes(&setup, reader->cartesian, siteSize, latticeDims, mapping);
+  
+  lemonSetupIOTypes(&reader->setup, reader->cartesian, siteSize, latticeDims, mapping);
 
   /* Install the data organization we worked out above on the file as a view.
      We keep the individual file pointers synchronized explicitly, so assume they are here. */
-  MPI_File_set_view(*reader->fp, reader->off + reader->pos, setup.etype, setup.ftype, "native", MPI_INFO_NULL);
+  MPI_File_set_view(*reader->fp, reader->off + reader->pos, reader->setup->etype, reader->setup->ftype, "native", MPI_INFO_NULL);
 
   /* Blast away! */
-  MPI_File_read_at_all(*reader->fp, reader->pos, data, setup.localVol, setup.etype, &status);
+  MPI_File_read_at_all(*reader->fp, reader->pos, data, reader->setup->localVol, reader->setup->etype, &status);
+  
   MPI_Barrier(reader->cartesian);
-
-  /* Synchronize the file pointer */
-  MPI_Get_count(&status, MPI_BYTE, &read);
-  reader->pos += setup.totalVol * siteSize;
-
-  /* We want to leave the file in a well-defined state, so we reset the view to a default. */
-  /* We don't want to reread any data, so we maximize the file pointer globally. */
+  MPI_Get_count(&status, reader->setup->etype, &read);
   MPI_Barrier(reader->cartesian);
   MPI_File_set_view(*reader->fp, 0, MPI_BYTE, MPI_BYTE, "native", MPI_INFO_NULL);
 
-  lemonFreeIOTypes(&setup);
-
-  /* Doing a data read should never get us to EOF, only header scanning -- any shortfall is an error */
-  if (read != siteSize * setup.localVol)
+  if (read < 0)
   {
-    fprintf(stderr, "[LEMON] Node %d reports in lemonReadLatticeParallel:\n"
-                    "        Could not read the required amount of data.\n", reader->my_rank);
+    fprintf(stderr, "[LEMON] Node %d reports in lemonReadLatticeParallelMapped:\n"
+                    "        Potential integer overflow in etype count.\n", reader->my_rank);
+    return LEMON_ERR_READ;
+  } 
+  
+  /* Synchronize the file pointer */
+  reader->pos += reader->setup->totalVol * reader->setup->esize;
+  if (((reader->setup->totalVol * reader->setup->esize) < 0) || (reader->pos < 0))
+  {
+    fprintf(stderr, "[LEMON] Node %d reports in lemonReadLatticeParallelMapped:\n"
+                    "        Integer overflow in file pointer adjusting.\n", reader->my_rank);
     return LEMON_ERR_READ;
   }
+
+  /* Doing a data read should never get us to EOF, only header scanning -- any shortfall is an error */
+  if (read != reader->setup->localVol)
+  {
+    fprintf(stderr, "[LEMON] Node %d reports in lemonReadLatticeParallelMapped:\n"
+                    "        Could not read the required amount of data.\n", reader->my_rank);
+    fprintf(stderr, "        needed: %lld, read: %lld\n", reader->setup->localVol * reader->setup->esize , read * reader->setup->esize);
+    return LEMON_ERR_READ;
+  }
+
+  lemonFreeIOTypes(&reader->setup);
 
   return LEMON_SUCCESS;
 }

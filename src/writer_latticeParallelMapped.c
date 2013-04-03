@@ -1,5 +1,5 @@
 /*****************************************************************************
- * LEMON v1.01                                                               *
+ * LEMON v1.1                                                                *
  *                                                                           *
  * This file is part of the LEMON implementation of the SCIDAC LIME format.  *
  *                                                                           *
@@ -38,40 +38,53 @@ int lemonWriteLatticeParallelMapped(LemonWriter *writer, void *data, MPI_Offset 
   int        written;
   int        error;
   MPI_Status status;
-  LemonSetup setup;
-
+  
   error = lemonClearWriterState(writer);
   if (error != LEMON_SUCCESS)
     return error;
-
-  lemonSetupIOTypes(&setup, writer->cartesian, siteSize, latticeDims, mapping);
-
+  
+  /* We will pass siteSize by pointer, because we want to scale to the largest contiguous region.
+   * Afterwards, and internal to these functions, siteSize will contain the number of bytes in the elementary datatype. */
+  lemonSetupIOTypes(&writer->setup, writer->cartesian, siteSize, latticeDims, mapping);
+  
   /* Install the data organization we worked out above on the file as a view */
   MPI_Barrier(writer->cartesian);
-  MPI_File_set_view(*writer->fp, writer->off + writer->pos, setup.etype, setup.ftype, "native", MPI_INFO_NULL);
+  MPI_File_set_view(*writer->fp, writer->off + writer->pos, writer->setup->etype, writer->setup->ftype, "native", MPI_INFO_NULL);
 
   /* Blast away! */
-  MPI_File_write_at_all(*writer->fp, writer->pos, data, setup.localVol, setup.etype, &status);
+  MPI_File_write_at_all(*writer->fp, writer->pos, data, writer->setup->localVol, writer->setup->etype, &status);
   MPI_File_sync(*writer->fp);
 
   MPI_Barrier(writer->cartesian);
-
-  writer->pos += setup.totalVol * siteSize;
-
-  /* We should reset the shared file pointer, in an MPI_BYTE based view... */
+  MPI_Get_count(&status, writer->setup->etype, &written);
   MPI_Barrier(writer->cartesian);
   MPI_File_set_view(*writer->fp, 0, MPI_BYTE, MPI_BYTE, "native", MPI_INFO_NULL);
-
-  /* Free up the resources we claimed for this operation. */
-  lemonFreeIOTypes(&setup);
-
-  MPI_Get_count(&status, MPI_BYTE, &written);
-  if (written != siteSize * setup.localVol)
+  
+  if (written < 0)
   {
-    fprintf(stderr, "[LEMON] Node %d reports in lemonWriteLatticeParallel:\n"
-                    "        Could not write the required amount of data.\n", writer->my_rank);
+    fprintf(stderr, "[LEMON] Node %d reports in lemonWriteLatticeParallelMapped:\n"
+                    "        Potential integer overflow in etype count.\n", writer->my_rank);
+    return LEMON_ERR_WRITE;
+  } 
+  
+  writer->pos += writer->setup->totalVol * writer->setup->esize;
+  if (((writer->setup->totalVol * writer->setup->esize) < 0) || (writer->pos < 0))
+  {
+    fprintf(stderr, "[LEMON] Node %d reports in lemonWriteLatticeParallelMapped:\n"
+                    "        Integer overflow in file pointer adjusting.\n", writer->my_rank);
     return LEMON_ERR_WRITE;
   }
+    
+  if (written != writer->setup->localVol)
+  {
+    fprintf(stderr, "[LEMON] Node %d reports in lemonWriteLatticeParallelMapped:\n"
+                    "        Could not write the required amount of data.\n", writer->my_rank);
+    fprintf(stderr, "        needed: %lld, written: %lld\n", writer->setup->localVol * writer->setup->esize , written * writer->setup->esize);
+    return LEMON_ERR_WRITE;
+  }
+
+  /* Free up the resources we claimed for this operation. */
+  lemonFreeIOTypes(&writer->setup);
 
   return LEMON_SUCCESS;
 }

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * LEMON v1.01                                                               *
+ * LEMON v1.1                                                                *
  *                                                                           *
  * This file is part of the LEMON implementation of the SCIDAC LIME format.  *
  *                                                                           *
@@ -108,6 +108,11 @@ int main(int argc, char **argv)
     usage(rank, argv);
     MPI_Finalize();
     return 1;
+  }
+  else
+  {
+    if (rank == 0)
+      fprintf(stderr, "Benchmarking Lemon %s\n", lemonVersionString());
   }
   
   L = atoi(argv[1]);

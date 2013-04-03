@@ -1,5 +1,5 @@
 /*****************************************************************************
- * LEMON v1.01                                                               *
+ * LEMON v1.1                                                                *
  *                                                                           *
  * This file is part of the LEMON implementation of the SCIDAC LIME format.  *
  *                                                                           *
@@ -26,12 +26,24 @@
 
 #pragma once
 
-static void lemonFreeIOTypes(LemonSetup *setup)
+static void lemonFreeIOTypes(struct LemonSetup **setup)
 {
+  int ctr = 0;
+  LemonSetup *ds = *setup;
+  
   /* Free up the resources. */
-  MPI_Type_free(&setup->etype);
-  MPI_Type_free(&setup->ftype);
-  free(setup->starts);
-  free(setup->localDims);
-  free(setup->mappedDims);
+  MPI_Type_free(&ds->etype);
+  MPI_Type_free(&ds->ftype);
+  for (ctr = ds->est - 1; ctr >= 0; --ctr)
+  {
+    MPI_Type_free(ds->etype_int[ctr]);
+    free(ds->etype_int[ctr]);
+  }
+  free(ds->etype_int);
+  free(ds->starts);
+  free(ds->localDims);
+  free(ds->mappedDims);
+  
+  free(ds);
+  ds = NULL;
 }
