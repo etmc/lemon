@@ -24,15 +24,10 @@
  *    A. Deuzeman (deuzeman@itp.unibe.ch)                                    *
  *****************************************************************************/
 
-#pragma once
+#include <config.h>
+#include <lemon.h>
 
-#include "internal_bigEndian.static"
-#include "internal_byteSwap.static"
-
-static uint64_t big_endian_long_long(uint64_t ull)
+char const *lemonVersionString()
 {
-  if( lemon_big_endian() == 0 )
-    lemon_byte_swap(&ull, sizeof(uint64_t), 1);
-  return ull;
+  return VERSION;
 }
-

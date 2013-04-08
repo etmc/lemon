@@ -1,5 +1,5 @@
 /*****************************************************************************
- * LEMON v1.01                                                               *
+ * LEMON v1.1                                                                *
  *                                                                           *
  * This file is part of the LEMON implementation of the SCIDAC LIME format.  *
  *                                                                           *
@@ -26,50 +26,65 @@
 
 #pragma once
 
-static void lemonSetupIOTypes(LemonSetup *setup, MPI_Comm cartesian, MPI_Offset siteSize, int const *latticeDims, int const *mapping)
+#include "internal_chainDecomposeEtype.static"
+
+static void lemonSetupIOTypes(LemonSetup **setup, MPI_Comm cartesian, MPI_Offset siteSize, int const *latticeDims, int const *mapping)
 {
-  int idx = 0;
+  int ctr = 0;
+  MPI_Offset idx = 0;
   int *mpiCoords = (int*)NULL;
   int *mpiDims = (int*)NULL;
   int *period  = (int*)NULL;
-
-  /* Set up data types and file view */
-  /* Elementary datatype for reading/writing: a single lattice site of the correct size.
-     Note that we always assume we obtained this as raw binary data of the correct type,
-     because apparently we cannot trust MPI libraries to deal with conversions internally. */
-  MPI_Type_contiguous(siteSize, MPI_BYTE, &setup->etype);
-  MPI_Type_commit(&setup->etype);
+  
+  *setup = (LemonSetup*)malloc(sizeof(LemonSetup));
+  LemonSetup *dsetup = *setup;
 
   /* Gathering of the required MPI data from the cartesian communicator. */
-  MPI_Cartdim_get(cartesian, &setup->ndims);
+  MPI_Cartdim_get(cartesian, &dsetup->ndims);
 
-  setup->starts = (int*)malloc(setup->ndims * sizeof(int));
-  setup->localDims = (int*)malloc(setup->ndims * sizeof(int));
-  setup->mappedDims = (int*)malloc(setup->ndims * sizeof(int));
-  setup->localVol = 1;
-  setup->totalVol = 1;
+  dsetup->starts = (int*)calloc(dsetup->ndims, sizeof(int));
+  dsetup->localDims = (int*)calloc(dsetup->ndims, sizeof(int));
+  dsetup->mappedDims = (int*)calloc(dsetup->ndims, sizeof(int));
+  dsetup->localVol = 1;
+  dsetup->totalVol = 1;
 
-  mpiCoords = (int*)malloc(setup->ndims * sizeof(int));
-  mpiDims = (int*)malloc(setup->ndims * sizeof(int));
-  period  = (int*)malloc(setup->ndims * sizeof(int));
+  mpiCoords = (int*)calloc(dsetup->ndims, sizeof(int));
+  mpiDims = (int*)calloc(dsetup->ndims, sizeof(int));
+  period  = (int*)calloc(dsetup->ndims, sizeof(int));
 
-  MPI_Cart_get(cartesian, setup->ndims, mpiDims, period, mpiCoords);
+  MPI_Cart_get(cartesian, dsetup->ndims, mpiDims, period, mpiCoords);
 
   /* Calculation of local lattice dimensions from the MPI data we obtained. */
-  for (idx = 0; idx < setup->ndims; ++idx)
+  for (idx = 0; idx < dsetup->ndims; ++idx)
+    dsetup->mappedDims[idx]  = latticeDims[mapping[idx]];
+
+  /* To avoid (minimize) issues with integer overflows, we will reorder the writing info slightly.
+     First of all, we want to create a basic datatype storing the smallest contiguous block of data.
+     This means taking the innermost local size Lz and creating a sequence of Lz * siteSize bytes
+     as our elementary type. The local and global volumes will, of course, scale down by a factor Lz
+     accordingly! */
+  siteSize *= (dsetup->mappedDims[0] / mpiDims[mapping[0]]);
+  dsetup->esize = siteSize;
+  dsetup->localDims[0] = 1;
+  dsetup->starts[0] = dsetup->localDims[0] * mpiCoords[mapping[0]];
+  
+  for (idx = 1; idx < dsetup->ndims; ++idx)
   {
-    setup->mappedDims[idx]  = latticeDims[mapping[idx]];
-    setup->localDims[idx]   = setup->mappedDims[idx] / mpiDims[mapping[idx]];
-    setup->localVol        *= setup->localDims[idx];
-    setup->totalVol        *= setup->mappedDims[idx];
-    setup->starts[idx]      = setup->localDims[idx] * mpiCoords[mapping[idx]];
+    dsetup->localDims[idx]   = dsetup->mappedDims[idx] / mpiDims[mapping[idx]];
+    dsetup->localVol        *= dsetup->localDims[idx];
+    dsetup->totalVol        *= dsetup->mappedDims[idx];
+    dsetup->starts[idx]      = dsetup->localDims[idx] * mpiCoords[mapping[idx]];
   }
   free(period);
   free(mpiDims);
   free(mpiCoords);
 
+  /* Set up data types and file view */
+  lemonChainDecomposeEtype(dsetup, siteSize); /* Fix potential overflow by chaining non-overflowing sizes. */
+   
   /* Build up a filetype that provides the right offsets for the reading of a N-dimensional lattice. */
-  MPI_Type_create_subarray(setup->ndims, setup->mappedDims, setup->localDims, setup->starts,
-			   MPI_ORDER_C, setup->etype, &setup->ftype);
-  MPI_Type_commit(&setup->ftype);
+  MPI_Type_create_subarray(dsetup->ndims, dsetup->mappedDims, dsetup->localDims, dsetup->starts,
+			   MPI_ORDER_C, dsetup->etype, &dsetup->ftype);
+  MPI_Type_commit(&dsetup->ftype);
+  dsetup->striped_flag = 1;
 }

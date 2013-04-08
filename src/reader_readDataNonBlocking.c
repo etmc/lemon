@@ -1,5 +1,5 @@
 /*****************************************************************************
- * LEMON v1.01                                                               *
+ * LEMON v1.1                                                                *
  *                                                                           *
  * This file is part of the LEMON implementation of the SCIDAC LIME format.  *
  *                                                                           *
@@ -28,7 +28,9 @@
 #include <lemon.h>
 #include <stdio.h>
 
-int lemonReaderReadDataNonBlocking(void *dest, MPI_Offset const *nbytes, LemonReader *reader)
+#include "internal_setupTypeChain.static"
+
+int lemonReaderReadDataNonBlocking(void *dest, MPI_Offset *nbytes, LemonReader *reader)
 {
   int err;
 
@@ -37,9 +39,10 @@ int lemonReaderReadDataNonBlocking(void *dest, MPI_Offset const *nbytes, LemonRe
     fprintf(stderr, "[LEMON] Node %d reports in lemonReaderReadDataNonBlocking:\n"
                     "        NULL pointer or uninitialized reader provided.\n", reader->my_rank);
     return LEMON_ERR_PARAM;
-  }
+  } 
 
-  err = MPI_File_read_at_all_begin(*reader->fp, reader->off + reader->pos, dest, *nbytes, MPI_BYTE);
+  lemonSetupTypeChain(&reader->setup, *nbytes);
+  err = MPI_File_read_at_all_begin(*reader->fp, reader->off + reader->pos, dest, 1, reader->setup->etype); 
 
   if (err != MPI_SUCCESS)
   {
@@ -50,7 +53,6 @@ int lemonReaderReadDataNonBlocking(void *dest, MPI_Offset const *nbytes, LemonRe
   reader->is_busy = 1;
   reader->is_striped = 0;
   reader->buffer = dest;
-  reader->bytes_wanted = *nbytes;
 
   return LEMON_SUCCESS;
 }

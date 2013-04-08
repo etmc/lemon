@@ -1,5 +1,5 @@
 /*****************************************************************************
- * LEMON v1.01                                                               *
+ * LEMON v1.1                                                                *
  *                                                                           *
  * This file is part of the LEMON implementation of the SCIDAC LIME format.  *
  *                                                                           *
@@ -28,6 +28,9 @@
 #include <lemon.h>
 #include <stdio.h>
 
+#include "internal_LemonSetup.ih"
+#include "internal_setupTypeChain.static"
+
 int lemonWriteRecordDataNonBlocking(void *source, MPI_Offset const *nbytes, LemonWriter* writer)
 {
   int err;
@@ -42,13 +45,13 @@ int lemonWriteRecordDataNonBlocking(void *source, MPI_Offset const *nbytes, Lemo
   if (writer->is_busy)
     lemonFinishWriting(writer);
 
+  lemonSetupTypeChain(&writer->setup, *nbytes);
   if (writer->my_rank == 0)
-    err = MPI_File_iwrite_at(*writer->fp, writer->off + writer->pos, source, *nbytes, MPI_BYTE, &writer->request);
+    err = MPI_File_iwrite_at(*writer->fp, writer->off + writer->pos, source, 1, writer->setup->etype, &writer->request);
 
   writer->is_busy = 1;
   writer->is_collective = 0;
   writer->buffer = source;
-  writer->bytes_wanted = *nbytes;
 
   MPI_File_sync(*writer->fp);
   MPI_Bcast(&err, 1, MPI_INT, 0, writer->cartesian);

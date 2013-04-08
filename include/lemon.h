@@ -1,5 +1,5 @@
 /*****************************************************************************
- * LEMON v1.01                                                               *
+ * LEMON v1.1                                                                *
  *                                                                           *
  * This file is part of the LEMON implementation of the SCIDAC LIME format.  *
  *                                                                           *
@@ -34,3 +34,5 @@
 #include "lemon_header.h"
 #include "lemon_reader.h"
 #include "lemon_writer.h"
+
+char const *lemonVersionString();
