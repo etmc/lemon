@@ -1,6 +1,6 @@
 AM_CFLAGS  = -I@top_builddir@/include
 AM_LDFLAGS = -L@top_builddir@/src 
-LDADD = @LIBS@ -llemon
+LDADD = @LIBS@ -llemon -lm
 
 #
 # The programs to build
