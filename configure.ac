@@ -28,8 +28,10 @@ AC_CHECK_HEADERS([stdint.h],
 )
 
 # Checks for library functions.
-AC_FUNC_MALLOC
-AC_CHECK_FUNCS([gettimeofday])
+# AC_FUNC_MALLOC disabled to ensure that cross-compilation works and autoconf does
+# not attempt to substitute 'rpl_malloc'
+##AC_FUNC_MALLOC
+AC_CHECK_FUNCS([malloc realloc calloc gettimeofday])
 
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([include/Makefile])
