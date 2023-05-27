@@ -36,6 +36,7 @@ typedef struct
   int ndims;
   int localVol;
   int totalVol;
+  int nranks;
 
   int *starts;
   int *localDims;

@@ -42,6 +42,7 @@ static void lemonSetupIOTypes(LemonSetup *setup, MPI_Comm cartesian, MPI_Offset 
 
   /* Gathering of the required MPI data from the cartesian communicator. */
   MPI_Cartdim_get(cartesian, &setup->ndims);
+  MPI_Comm_size(cartesian, &setup->nranks);
 
   setup->starts = (int*)malloc(setup->ndims * sizeof(int));
   setup->localDims = (int*)malloc(setup->ndims * sizeof(int));
