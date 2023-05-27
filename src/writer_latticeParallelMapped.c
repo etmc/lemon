@@ -27,6 +27,7 @@
 #include <config.h>
 #include <lemon.h>
 #include <stdio.h>
+#include <limits.h>
 
 #include "internal_LemonSetup.ih"
 #include "internal_clearWriterState.static"
@@ -50,13 +51,31 @@ int lemonWriteLatticeParallelMapped(LemonWriter *writer, void *data, MPI_Offset 
   MPI_Barrier(writer->cartesian);
   MPI_File_set_view(*writer->fp, writer->off + writer->pos, setup.etype, setup.ftype, "native", MPI_INFO_NULL);
 
-  /* Blast away! */
-  MPI_File_write_at_all(*writer->fp, writer->pos, data, setup.localVol, setup.etype, &status);
-  MPI_File_sync(*writer->fp);
+  long int bytes = (long int)setup.localVol * (long int)siteSize;
+  long int buffer_offset = 0;
 
-  MPI_Barrier(writer->cartesian);
+  while( bytes > 0 ){
+    int chunk = bytes > (long int)INT_MAX ? (INT_MAX/siteSize)*siteSize : bytes;
+    bytes -= (long int)chunk;
+    
+    /* Blast away! */
+    MPI_File_write_at_all(*writer->fp, writer->pos, &data[buffer_offset], chunk/siteSize, setup.etype, &status);
+    MPI_File_sync(*writer->fp);
 
-  writer->pos += setup.totalVol * siteSize;
+    MPI_Barrier(writer->cartesian);
+
+    writer->pos += (long int)chunk * (long int)setup.nranks;
+    
+    MPI_Get_count(&status, MPI_BYTE, &written);
+
+    buffer_offset += (long int)written;
+    if (written != chunk)
+    {
+      fprintf(stderr, "[LEMON] Node %d reports in lemonWriteLatticeParallel:\n"
+                      "        Could not write the required amount of data.\n", writer->my_rank);
+      return LEMON_ERR_WRITE;
+    }
+  }
 
   /* We should reset the shared file pointer, in an MPI_BYTE based view... */
   MPI_Barrier(writer->cartesian);
@@ -64,14 +83,6 @@ int lemonWriteLatticeParallelMapped(LemonWriter *writer, void *data, MPI_Offset 
 
   /* Free up the resources we claimed for this operation. */
   lemonFreeIOTypes(&setup);
-
-  MPI_Get_count(&status, MPI_BYTE, &written);
-  if (written != siteSize * setup.localVol)
-  {
-    fprintf(stderr, "[LEMON] Node %d reports in lemonWriteLatticeParallel:\n"
-                    "        Could not write the required amount of data.\n", writer->my_rank);
-    return LEMON_ERR_WRITE;
-  }
 
   return LEMON_SUCCESS;
 }
