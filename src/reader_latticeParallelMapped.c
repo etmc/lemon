@@ -55,7 +55,7 @@ int lemonReadLatticeParallelMapped(LemonReader *reader, void *data, MPI_Offset s
   MPI_Barrier(reader->cartesian);
 
   /* Synchronize the file pointer */
-  MPI_Get_count(&status, MPI_BYTE, &read);
+  MPI_Get_count(&status, setup.etype, &read);
   reader->pos += setup.totalVol * siteSize;
 
   /* We want to leave the file in a well-defined state, so we reset the view to a default. */
@@ -66,7 +66,7 @@ int lemonReadLatticeParallelMapped(LemonReader *reader, void *data, MPI_Offset s
   lemonFreeIOTypes(&setup);
 
   /* Doing a data read should never get us to EOF, only header scanning -- any shortfall is an error */
-  if (read != siteSize * setup.localVol)
+  if (read != setup.localVol)
   {
     fprintf(stderr, "[LEMON] Node %d reports in lemonReadLatticeParallel:\n"
                     "        Could not read the required amount of data.\n", reader->my_rank);

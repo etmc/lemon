@@ -62,11 +62,12 @@ int lemonWriteLatticeParallelMapped(LemonWriter *writer, void *data, MPI_Offset 
   MPI_Barrier(writer->cartesian);
   MPI_File_set_view(*writer->fp, 0, MPI_BYTE, MPI_BYTE, "native", MPI_INFO_NULL);
 
+  MPI_Get_count(&status, setup.etype, &written);
+
   /* Free up the resources we claimed for this operation. */
   lemonFreeIOTypes(&setup);
 
-  MPI_Get_count(&status, MPI_BYTE, &written);
-  if (written != siteSize * setup.localVol)
+  if (written != setup.localVol)
   {
     fprintf(stderr, "[LEMON] Node %d reports in lemonWriteLatticeParallel:\n"
                     "        Could not write the required amount of data.\n", writer->my_rank);
