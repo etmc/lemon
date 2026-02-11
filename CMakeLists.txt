@@ -16,10 +16,9 @@ include(CheckSymbolExists)
 include(CMakePackageConfigHelpers)
 
 if(NOT DEFINED CMAKE_C_STANDARD)
-set(CMAKE_C_STANDARD 11)
-set(CMAKE_C_STANDARD_REQUIRED ON)
+  set(CMAKE_C_STANDARD 11)
+  set(CMAKE_C_STANDARD_REQUIRED ON)
 endif()
-
 
 # Boiler Plate for Testing
 include(CTest)
@@ -127,7 +126,8 @@ write_basic_package_version_file(
   VERSION "${CLEMON_VERSION}"
   COMPATIBILITY SameMajorVersion)
 
-configure_file("${PROJECT_SOURCE_DIR}/cmake/config.h.in" "${PROJECT_BINARY_DIR}/config.h" @ONLY)
+configure_file("${PROJECT_SOURCE_DIR}/cmake/config.h.in"
+               "${PROJECT_BINARY_DIR}/config.h" @ONLY)
 
 configure_file("${PROJECT_SOURCE_DIR}/cmake/ClemonConfig.cmake.in"
                "${PROJECT_BINARY_DIR}/ClemonConfig.cmake" @ONLY)
@@ -153,7 +153,11 @@ install(
   NAMESPACE clemon::
   DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
 
+foreach(_app lemon_contents lemon_benchmark)
+  install(FILES "${_app}" DESTINATION ${CMAKE_INSTALL_BINDIR})
+endforeach()
+
 foreach(_inc ${lemon_headers})
-install(FILES "${_inc}"
-        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}")
+  install(FILES "${_inc}"
+          DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}")
 endforeach()
