@@ -5,7 +5,7 @@ project(
   LANGUAGES C)
 
 option(CMAKE_POSITION_INDEPENDENT_CODE "Enable position independent code" ON)
-option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
+option(BUILD_SHARED_LIBS "Build using shared libraries" OFF)
 
 # Boiler Plate for installation
 include(GNUInstallDirs)
