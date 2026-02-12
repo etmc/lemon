@@ -154,7 +154,7 @@ install(
   DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
 
 foreach(_app lemon_contents lemon_benchmark)
-  install(FILES "${_app}" DESTINATION ${CMAKE_INSTALL_BINDIR})
+  install(FILES "${CMAKE_BINARY_DIR}/${_app}" DESTINATION ${CMAKE_INSTALL_BINDIR})
 endforeach()
 
 foreach(_inc ${lemon_headers})
