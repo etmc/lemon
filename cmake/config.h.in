@@ -59,7 +59,7 @@
 #define PACKAGE "@PROJECT_NAME@"
 
 /* Define to the address where bug reports for this package should be sent. */
-#define PACKAGE_BUGREPORT @PACKAGE_BUGREPORT @
+#define PACKAGE_BUGREPORT "@PACKAGE_BUGREPORT@"
 
 /* Define to the full name of this package. */
 #cmakedefine PACKAGE_NAME "@PROJECT_NAME@"
@@ -68,7 +68,7 @@
 #cmakedefine PACKAGE_STRING "@PROJECT_NAME @PROJECT_VERSION@"
 
 /* Define to the one symbol short name of this package. */
-#cmakedefine PACKAGE_TARNAME "clime"
+#cmakedefine PACKAGE_TARNAME "lime"
 
 /* Define to the home page for this package. */
 #cmakedefine PACKAGE_URL "@PROJECT_URL@"
