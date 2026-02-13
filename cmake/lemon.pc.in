@@ -1,0 +1,11 @@
+prefix="@CMAKE_INSTALL_PREFIX@"
+exec_prefix="${prefix}"
+libdir="${prefix}/@CMAKE_INSTALL_LIBDIR@"
+includedir="${prefix}/@CMAKE_INSTALL_INCLUDEDIR@"
+
+Name: lemon
+Description: @lemon_DESCRIPTION@
+URL: @lemon_HOMEPAGE_URL@
+Version: @lemon_VERSION@
+Cflags: -I"${includedir}/lemon"
+Libs: -L"${libdir}" -llemon

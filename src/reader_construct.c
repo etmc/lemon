@@ -24,7 +24,6 @@
  *    A. Deuzeman (deuzeman@itp.unibe.ch)                                    *
  *****************************************************************************/
 
-#include <config.h>
 #include <lemon.h>
 
 LemonReader* lemonCreateReader(MPI_File *fp, MPI_Comm cartesian)

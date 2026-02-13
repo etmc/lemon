@@ -23,7 +23,6 @@
  * For support requests or bug reports, please contact                       *
  *    A. Deuzeman (deuzeman@itp.unibe.ch)                                    *
  *****************************************************************************/
-#include <config.h>
 #include <lemon.h>
 #include <stdio.h>
 

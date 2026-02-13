@@ -24,7 +24,6 @@
  *    A. Deuzeman (deuzeman@itp.unibe.ch)                                    *
  *****************************************************************************/
 
-#include <config.h>
 #include <lemon.h>
 #include "internal_writeRecordBinaryHeader.static"
 
