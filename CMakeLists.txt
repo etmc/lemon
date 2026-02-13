@@ -1,7 +1,9 @@
 cmake_minimum_required(VERSION 3.24)
 project(
-  clemon
+  lemon
   VERSION 0.99
+  HOMEPAGE_URL "https://github.com/etmc/lemon"
+  DESCRIPTION "Lemon is an MPI parallel I/O library that is intended to allow for efficient parallel I/O of both binary and metadata on massively parallel architectures. Data is stored in the SciDAC Lattice QCD Interchange Message Encapsulation format, that allows for storing large blocks of binary data and corresponding metadata in the same file."
   LANGUAGES C)
 
 option(CMAKE_POSITION_INDEPENDENT_CODE "Enable position independent code" ON)
@@ -9,10 +11,6 @@ option(BUILD_SHARED_LIBS "Build using shared libraries" OFF)
 
 # Boiler Plate for installation
 include(GNUInstallDirs)
-include(CheckIncludeFiles)
-include(CheckFunctionExists)
-include(CheckTypeSize)
-include(CheckSymbolExists)
 include(CMakePackageConfigHelpers)
 
 if(NOT DEFINED CMAKE_C_STANDARD)
@@ -24,19 +22,6 @@ endif()
 include(CTest)
 
 find_package(MPI REQUIRED)
-set(HAVE_LIBMPI ON)
-
-check_symbol_exists(gettimeofday "time.h" HAVE_GET_TIMEOFDAY)
-set(HAVE_MALLOC ON)
-
-check_include_files(memory.h HAVE_MEMORY_H)
-check_include_files(stdint.h HAVE_STDINT_H)
-check_include_files(stdlib.h HAVE_STDLIB_H)
-check_include_files(strings.h HAVE_STRINGS_H)
-check_include_files(string.h HAVE_STRING_H)
-check_include_files(sys/sys_stats.h HAVE_SYS_STATS_H)
-check_include_files(time.h HAVE_TIME_H)
-check_include_files(sys/sys_types.h HAVE_SYS_TYPES_H)
 
 list(
   APPEND
@@ -78,11 +63,12 @@ list(
   src/reader_latticeParallelNonBlockingMapped.c
   src/writer_recordDataNonBlocking.c)
 
-add_library(lemon SHARED ${LEMON_SRCS})
-add_library(lemon::clemon ALIAS lemon)
+add_library(lemon ${LEMON_SRCS})
+add_library(lemon::lemon ALIAS lemon)
 target_link_libraries(lemon PUBLIC MPI::MPI_C m)
 target_include_directories(lemon
                            PUBLIC $<INSTALL_INTERFACE:include/${PROJECT_NAME}>)
+
 include_directories(
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -122,24 +108,21 @@ list(
 include(GNUInstallDirs)
 
 write_basic_package_version_file(
-  "${PROJECT_BINARY_DIR}/ClemonConfigVersion.cmake"
-  VERSION "${CLEMON_VERSION}"
+  "${PROJECT_BINARY_DIR}/lemonConfigVersion.cmake"
+  VERSION "${PROJECT_VERSION}"
   COMPATIBILITY SameMajorVersion)
 
-configure_file("${PROJECT_SOURCE_DIR}/cmake/config.h.in"
-               "${PROJECT_BINARY_DIR}/config.h" @ONLY)
+configure_file("${PROJECT_SOURCE_DIR}/cmake/lemonConfig.cmake.in"
+               "${PROJECT_BINARY_DIR}/lemonConfig.cmake" @ONLY)
 
-configure_file("${PROJECT_SOURCE_DIR}/cmake/ClemonConfig.cmake.in"
-               "${PROJECT_BINARY_DIR}/ClemonConfig.cmake" @ONLY)
+configure_file("${PROJECT_SOURCE_DIR}/cmake/lemon.pc.in"
+               "${PROJECT_BINARY_DIR}/lemon.pc" @ONLY)
 
-configure_file("${PROJECT_SOURCE_DIR}/cmake/clemon.pc.in"
-               "${PROJECT_BINARY_DIR}/clemon.pc" @ONLY)
-
-install(FILES "${PROJECT_BINARY_DIR}/ClemonConfig.cmake"
-              "${PROJECT_BINARY_DIR}/ClemonConfigVersion.cmake"
+install(FILES "${PROJECT_BINARY_DIR}/lemonConfig.cmake"
+              "${PROJECT_BINARY_DIR}/lemonConfigVersion.cmake"
         DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
 
-install(FILES "${PROJECT_BINARY_DIR}/clemon.pc"
+install(FILES "${PROJECT_BINARY_DIR}/lemon.pc"
         DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
 
 install(
@@ -149,12 +132,13 @@ install(
 
 install(
   EXPORT lemon_targets
-  FILE ClemonTargets.cmake
-  NAMESPACE clemon::
+  FILE lemonTargets.cmake
+  NAMESPACE lemon::
   DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
 
 foreach(_app lemon_contents lemon_benchmark)
-  install(FILES "${CMAKE_BINARY_DIR}/${_app}" DESTINATION ${CMAKE_INSTALL_BINDIR})
+  install(FILES "${CMAKE_BINARY_DIR}/${_app}"
+          DESTINATION ${CMAKE_INSTALL_BINDIR})
 endforeach()
 
 foreach(_inc ${lemon_headers})

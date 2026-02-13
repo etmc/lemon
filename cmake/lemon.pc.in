@@ -3,9 +3,9 @@ exec_prefix="${prefix}"
 libdir="${prefix}/@CMAKE_INSTALL_LIBDIR@"
 includedir="${prefix}/@CMAKE_INSTALL_INCLUDEDIR@"
 
-Name: @PROJECT_NAME@
-Description: @CMAKE_PROJECT_DESCRIPTION@
-URL: @CMAKE_PROJECT_HOMEPAGE_URL@
-Version: @PROJECT_VERSION@
-Cflags: -I"${includedir}/clemon"
+Name: lemon
+Description: @lemon_DESCRIPTION@
+URL: @lemon_HOMEPAGE_URL@
+Version: @lemon_VERSION@
+Cflags: -I"${includedir}/lemon"
 Libs: -L"${libdir}" -llemon

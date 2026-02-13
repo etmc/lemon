@@ -24,7 +24,7 @@
  *    A. Deuzeman (deuzeman@itp.unibe.ch)                                    *
  *****************************************************************************/
 
-#include <config.h>
+
 #include <lemon.h>
 
 LemonWriter* lemonCreateWriter(MPI_File *fp, MPI_Comm cartesian)

@@ -24,7 +24,6 @@
  *    A. Deuzeman (deuzeman@itp.unibe.ch)                                    *
  *****************************************************************************/
 
-#include <config.h>
 #include <lemon.h>
 
 void lemonDestroyReader(LemonReader *reader)

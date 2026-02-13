@@ -24,7 +24,7 @@
  *    A. Deuzeman (deuzeman@itp.unibe.ch)                                    *
  *****************************************************************************/
 
-#include <config.h>
+
 #include <lemon.h>
 
 int lemonWriterSetState(LemonWriter *wdest, LemonWriter const *wsrc)
