@@ -35,3 +35,4 @@ ar-lib
 include/stamp-h1
 src/.deps/
 *.in
+tags*

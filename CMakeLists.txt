@@ -66,13 +66,18 @@ list(
 add_library(lemon ${LEMON_SRCS})
 add_library(lemon::lemon ALIAS lemon)
 target_link_libraries(lemon PUBLIC MPI::MPI_C m)
-target_include_directories(lemon
-                           PUBLIC $<INSTALL_INTERFACE:include/${PROJECT_NAME}>)
 
-include_directories(
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>)
+# We expose publicly the include files in the source directory
+# at build time and the include files in the installation directory
+# at installation time.
+# We do this to ensure that include directories can be found correctly
+# when lemon is used in a CMake project via FetchContent_Declare / FetchContent_MakeAvailable
+# (which does not perform the installation step) and when lemon is installed somewhere.
+target_include_directories(lemon
+                           PUBLIC
+                           $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+                           $<INSTALL_INTERFACE:${CMAKE_INSTALL_PREFIX}/include/${PROJECT_NAME}>
+                           )
 
 add_executable(lemon_contents check/lemon_contents.c)
 add_executable(lemon_benchmark check/lemon_benchmark.c check/md5.c
@@ -92,20 +97,13 @@ foreach(
   xlf
   parallel_non_blocking
   xlf_non_blocking)
-  target_link_libraries(${_progs} PUBLIC lemon)
+    target_link_libraries(${_progs} PRIVATE lemon)
+    target_include_directories(${_progs} 
+      PRIVATE
+      $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+      $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+      $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>)
 endforeach()
-
-list(
-  APPEND
-  lemon_headers
-  ${PROJECT_SOURCE_DIR}/include/lemon_binheader.h
-  ${PROJECT_SOURCE_DIR}/include/lemon.h
-  ${PROJECT_SOURCE_DIR}/include/lemon_writer.h
-  ${PROJECT_SOURCE_DIR}/include/lemon_defines.h
-  ${PROJECT_SOURCE_DIR}/include/lemon_header.h
-  ${PROJECT_SOURCE_DIR}/include/lemon_reader.h)
-
-include(GNUInstallDirs)
 
 write_basic_package_version_file(
   "${PROJECT_BINARY_DIR}/lemonConfigVersion.cmake"
@@ -128,7 +126,8 @@ install(FILES "${PROJECT_BINARY_DIR}/lemon.pc"
 install(
   TARGETS lemon
   EXPORT lemon_targets
-  LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}")
+  LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+)
 
 install(
   EXPORT lemon_targets
@@ -136,12 +135,25 @@ install(
   NAMESPACE lemon::
   DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
 
-foreach(_app lemon_contents lemon_benchmark)
-  install(FILES "${CMAKE_BINARY_DIR}/${_app}"
-          DESTINATION ${CMAKE_INSTALL_BINDIR})
+list(
+  APPEND
+  lemon_headers
+  ${PROJECT_SOURCE_DIR}/include/lemon_binheader.h
+  ${PROJECT_SOURCE_DIR}/include/lemon.h
+  ${PROJECT_SOURCE_DIR}/include/lemon_writer.h
+  ${PROJECT_SOURCE_DIR}/include/lemon_defines.h
+  ${PROJECT_SOURCE_DIR}/include/lemon_header.h
+  ${PROJECT_SOURCE_DIR}/include/lemon_reader.h
+)
+foreach(_inc ${lemon_headers})
+  install(
+    FILES "${_inc}"
+    DESTINATION "${CMAKE_INSTALL_PREFIX}/include/${PROJECT_NAME}"
+  )
 endforeach()
 
-foreach(_inc ${lemon_headers})
-  install(FILES "${_inc}"
-          DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}")
+foreach(_app lemon_contents lemon_benchmark)
+  install(FILES "${CMAKE_BINARY_DIR}/${_app}"
+          DESTINATION "${CMAKE_INSTALL_BINDIR}")
 endforeach()
+
