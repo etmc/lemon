@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.24)
 project(
   lemon
-  VERSION 0.99
+  VERSION 1.2.0
   HOMEPAGE_URL "https://github.com/etmc/lemon"
   DESCRIPTION "Lemon is an MPI parallel I/O library that is intended to allow for efficient parallel I/O of both binary and metadata on massively parallel architectures. Data is stored in the SciDAC Lattice QCD Interchange Message Encapsulation format, that allows for storing large blocks of binary data and corresponding metadata in the same file."
   LANGUAGES C)
