@@ -153,7 +153,9 @@ foreach(_inc ${lemon_headers})
 endforeach()
 
 foreach(_app lemon_contents lemon_benchmark)
-  install(TARGETS "${CMAKE_CURRENT_BINARY_DIR}/${_app}"
+  #install(TARGETS "${CMAKE_CURRENT_BINARY_DIR}/${_app}"
+  #        RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}")
+  install(TARGETS "${_app}"
           RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}")
 endforeach()
 
