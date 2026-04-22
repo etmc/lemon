@@ -106,18 +106,18 @@ foreach(
 endforeach()
 
 write_basic_package_version_file(
-  "${PROJECT_BINARY_DIR}/lemonConfigVersion.cmake"
+  "${CMAKE_CURRENT_BINARY_DIR}/lemonConfigVersion.cmake"
   VERSION "${PROJECT_VERSION}"
   COMPATIBILITY SameMajorVersion)
 
-configure_file("${PROJECT_SOURCE_DIR}/cmake/lemonConfig.cmake.in"
-               "${PROJECT_BINARY_DIR}/lemonConfig.cmake" @ONLY)
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/cmake/lemonConfig.cmake.in"
+               "${CMAKE_CURRENT_BINARY_DIR}/lemonConfig.cmake" @ONLY)
 
-configure_file("${PROJECT_SOURCE_DIR}/cmake/lemon.pc.in"
-               "${PROJECT_BINARY_DIR}/lemon.pc" @ONLY)
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/cmake/lemon.pc.in"
+               "${CMAKE_CURRENT_BINARY_DIR}/lemon.pc" @ONLY)
 
-install(FILES "${PROJECT_BINARY_DIR}/lemonConfig.cmake"
-              "${PROJECT_BINARY_DIR}/lemonConfigVersion.cmake"
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/lemonConfig.cmake"
+               "${CMAKE_CURRENT_BINARY_DIR}/lemonConfigVersion.cmake"
         DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
 
 install(FILES "${PROJECT_BINARY_DIR}/lemon.pc"
@@ -138,12 +138,12 @@ install(
 list(
   APPEND
   lemon_headers
-  ${PROJECT_SOURCE_DIR}/include/lemon_binheader.h
-  ${PROJECT_SOURCE_DIR}/include/lemon.h
-  ${PROJECT_SOURCE_DIR}/include/lemon_writer.h
-  ${PROJECT_SOURCE_DIR}/include/lemon_defines.h
-  ${PROJECT_SOURCE_DIR}/include/lemon_header.h
-  ${PROJECT_SOURCE_DIR}/include/lemon_reader.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/lemon_binheader.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/lemon.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/lemon_writer.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/lemon_defines.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/lemon_header.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/lemon_reader.h
 )
 foreach(_inc ${lemon_headers})
   install(
@@ -153,7 +153,7 @@ foreach(_inc ${lemon_headers})
 endforeach()
 
 foreach(_app lemon_contents lemon_benchmark)
-  install(FILES "${CMAKE_BINARY_DIR}/${_app}"
-          DESTINATION "${CMAKE_INSTALL_BINDIR}")
+  install(TARGETS "${_app}"
+          RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}")
 endforeach()
 
