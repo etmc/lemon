@@ -12,6 +12,10 @@ option(BUILD_SHARED_LIBS "Build using shared libraries" OFF)
 # Boiler Plate for installation
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
+# on some architectures libs will be installed into `lib64` by default
+# for compatibility reasons we prefer `lib`
+set(CMAKE_INSTALL_LIBDIR lib) 
+
 
 if(NOT DEFINED CMAKE_C_STANDARD)
   set(CMAKE_C_STANDARD 11)
